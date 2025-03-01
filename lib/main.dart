@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:maggic_coffe/view/home/menu/menu_view_screen.dart';
+import 'package:maggic_coffe/view/home/order_options/order_options_view_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MenuViewScreen(),
+      home: const OrderOptionsViewScreen(),
     );
   }
 }
