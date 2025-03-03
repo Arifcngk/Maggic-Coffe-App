@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:maggic_coffe/global_widget/appbar_global_widget.dart';
+import 'package:maggic_coffe/view/home/order_options/widgets/coffe_lover_card_widget.dart';
+import 'package:maggic_coffe/view/home/order_options/widgets/custom_button_widget.dart';
 
 import 'package:maggic_coffe/view/home/order_options/widgets/custom_text_widget.dart';
 import 'package:maggic_coffe/view/home/order_options/widgets/image_product_widget.dart';
+import 'package:maggic_coffe/view/home/order_options/widgets/onsite_takeaway_widget.dart';
 import 'package:maggic_coffe/view/home/order_options/widgets/product_volume_widget.dart';
 import 'package:maggic_coffe/view/home/order_options/widgets/ristretto_widget.dart';
 
@@ -49,13 +53,35 @@ class _OrderOptionsViewScreenState extends State<OrderOptionsViewScreen> {
                   _divider(),
                   const ProductRistrettoWidget(),
                   _divider(),
-                  const ProductVolumeWidget()
+                  const ProductVolumeWidget(),
+                  _divider(),
+                  const OnsiteTakeawayWidget(),
+                  _divider(),
+                  const CoffeLoverCardWidget(),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.06),
+                  _totalBuy(),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                  const CustomButtonWidget()
                 ],
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Row _totalBuy() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        const textWidget(txt: "Total Amount", fontSize: 20),
+        Text(
+          "BYN 3.00",
+          style: GoogleFonts.poppins(
+              fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black),
+        )
+      ],
     );
   }
 
