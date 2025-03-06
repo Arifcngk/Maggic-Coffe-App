@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class AppbarGlobalWidget extends StatelessWidget implements PreferredSizeWidget {
+class AppbarGlobalWidget extends StatelessWidget
+    implements PreferredSizeWidget {
   @override
   Size get preferredSize => const Size.fromHeight(56); // AppBar yüksekliği
 
@@ -16,9 +17,14 @@ class AppbarGlobalWidget extends StatelessWidget implements PreferredSizeWidget 
   Widget build(BuildContext context) {
     return AppBar(
       backgroundColor: Colors.white,
-      leading: const Icon(
-        Icons.arrow_back_ios,
-        color: Color(0xFF001833),
+      leading: IconButton(
+        icon: const Icon(
+          Icons.arrow_back_ios,
+          color: Color(0xFF001833),
+        ),
+        onPressed: () {
+          Navigator.pop(context); // Önceki sayfaya geri dön
+        },
       ),
       elevation: 0,
       actions: const [
