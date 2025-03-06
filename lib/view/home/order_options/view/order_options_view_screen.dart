@@ -3,12 +3,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:maggic_coffe/global_widget/appbar_global_widget.dart';
 import 'package:maggic_coffe/view/home/order_options/widgets/coffe_lover_card_widget.dart';
 import 'package:maggic_coffe/view/home/order_options/widgets/custom_button_widget.dart';
-
 import 'package:maggic_coffe/view/home/order_options/widgets/custom_text_widget.dart';
 import 'package:maggic_coffe/view/home/order_options/widgets/image_product_widget.dart';
 import 'package:maggic_coffe/view/home/order_options/widgets/onsite_takeaway_widget.dart';
 import 'package:maggic_coffe/view/home/order_options/widgets/product_volume_widget.dart';
 import 'package:maggic_coffe/view/home/order_options/widgets/ristretto_widget.dart';
+import 'package:maggic_coffe/view/home/order_options/widgets/sliding_up_panel_widget.dart';
+import 'package:sliding_up_panel/sliding_up_panel.dart';
 
 class OrderOptionsViewScreen extends StatefulWidget {
   const OrderOptionsViewScreen({super.key});
@@ -18,7 +19,9 @@ class OrderOptionsViewScreen extends StatefulWidget {
 }
 
 class _OrderOptionsViewScreenState extends State<OrderOptionsViewScreen> {
-  int count = 1; // Sayı başlangıç değeri
+  int count = 1;
+  final PanelController _panelController =
+      PanelController(); // Panel kontrolcüsü
 
   void increment() {
     setState(() {
@@ -39,34 +42,45 @@ class _OrderOptionsViewScreenState extends State<OrderOptionsViewScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppbarGlobalWidget(txt: "Order"),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
-        child: Column(
-          children: [
-            const ImageWidget(),
-            const SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              child: Column(
-                children: [
-                  _productQuantity(),
-                  _divider(),
-                  const ProductRistrettoWidget(),
-                  _divider(),
-                  const ProductVolumeWidget(),
-                  _divider(),
-                  const OnsiteTakeawayWidget(),
-                  _divider(),
-                  const CoffeLoverCardWidget(),
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.06),
-                  _totalBuy(),
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.01),
-                  const CustomButtonWidget()
-                ],
-              ),
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+            child: Column(
+              children: [
+                const ImageWidget(),
+                const SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  child: Column(
+                    children: [
+                      _productQuantity(),
+                      _divider(),
+                      const ProductRistrettoWidget(),
+                      _divider(),
+                      const ProductVolumeWidget(),
+                      _divider(),
+                      const OnsiteTakeawayWidget(),
+                      _divider(),
+                      const CoffeLoverCardWidget(),
+                      SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.06),
+                      _totalBuy(),
+                      SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.01),
+                      CustomButtonWidget(
+                        onPressed: () => _panelController.open(), // Paneli aç
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+          SlidingUpPanelWidget(
+            panelController: _panelController,
+          ),
+        ],
       ),
     );
   }
@@ -103,14 +117,12 @@ class _OrderOptionsViewScreenState extends State<OrderOptionsViewScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                // Eksiltme Butonu
                 IconButton(
                   onPressed: decrement,
                   icon: const Icon(Icons.remove, size: 15),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
                 ),
-                // Sayı
                 Text(
                   "$count",
                   style: const TextStyle(
@@ -118,7 +130,6 @@ class _OrderOptionsViewScreenState extends State<OrderOptionsViewScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                // Artırma Butonu
                 IconButton(
                   onPressed: increment,
                   icon: const Icon(Icons.add, size: 15),

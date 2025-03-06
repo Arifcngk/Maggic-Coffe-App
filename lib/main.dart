@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:maggic_coffe/global_widget/tabbar_global_widget.dart';
-import 'package:maggic_coffe/view/home/menu/menu_view_screen.dart';
+import 'package:maggic_coffe/view/home/order_options/view/order_is_confirmed_view.dart';
+import 'package:maggic_coffe/view/rewards/reward_view.dart';
 
 void main() {
   runApp(const MyApp());
@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const BottomBarWidget(),
+      home: const RewardViewScreen(),
     );
   }
 }
