@@ -32,52 +32,6 @@ class _MenuViewScreenState extends State<MenuViewScreen> {
     );
   }
 
-  Padding _bottomNavigatonBar() {
-    return Padding(
-      padding: const EdgeInsets.only(left: 25, right: 25, bottom: 20),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 10,
-                spreadRadius: 2,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: BottomNavigationBar(
-            backgroundColor: Colors.white,
-            selectedItemColor: Colors.brown,
-            unselectedItemColor: Colors.grey,
-            showSelectedLabels: false,
-            showUnselectedLabels: false,
-            currentIndex: _selectedIndex,
-            onTap: _onItemTapped,
-            items: const [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.menu_book_outlined, size: 30),
-                label: 'Menu',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.coffee, size: 30),
-                label: 'Random 1',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.settings, size: 30),
-                label: 'Random 2',
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
   Positioned _tabBar(BuildContext context) {
     return Positioned.fill(
       top: MediaQuery.of(context).size.height * 0.1,
@@ -119,6 +73,43 @@ class _MenuViewScreenState extends State<MenuViewScreen> {
                 },
               ),
             ),
+            const SizedBox(height: 10),
+            Card(
+              color: Colors.white,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  IconButton(
+                    icon: const Icon(
+                      Icons.coffee_maker_outlined,
+                      color: Color(0xFF324A59),
+                    ),
+                    onPressed: () {
+                      // Ana sayfa işlemi
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(
+                      Icons.card_giftcard_rounded,
+                      color: Color(0xFF324A59),
+                    ),
+                    onPressed: () {
+                      // Favorilere ekleme işlemi
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(
+                      Icons.account_balance_wallet_outlined,
+                      color: Color(0xFF324A59),
+                    ),
+                    onPressed: () {
+                      // Sepet işlemi
+                    },
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
           ],
         ),
       ),
