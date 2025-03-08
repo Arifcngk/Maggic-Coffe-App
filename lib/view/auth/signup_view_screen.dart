@@ -1,10 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:maggic_coffe/provider/auth_provider.dart';
 import 'package:maggic_coffe/view/auth/signin_view_screen.dart';
 import 'package:maggic_coffe/view/auth/widget/base_text_widget.dart';
+import 'package:provider/provider.dart';
 
-class SignupViewScreen extends StatelessWidget {
+class SignupViewScreen extends StatefulWidget {
   const SignupViewScreen({super.key});
+
+  @override
+  State<SignupViewScreen> createState() => _SignupViewScreenState();
+}
+
+class _SignupViewScreenState extends State<SignupViewScreen> {
+  final TextEditingController _emailControlller = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _userNameController = TextEditingController();
+  String? _errorMessage;
+
+// register işlemi yapar
+  Future<void> _register() async {
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      authProvider.register(
+        username: _userNameController.text,
+        phone: _phoneController.text,
+        email: _emailControlller.text,
+        password: _passwordController.text,
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Kayıt Başarılı, Giriş Yapabilirsiniz")),
+      );
+    } catch (e) {
+      print(e);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +79,7 @@ class SignupViewScreen extends StatelessWidget {
             Align(
               alignment: Alignment.centerRight,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () => _register(),
                 style: ElevatedButton.styleFrom(
                   shape: const CircleBorder(), // Butonu tamamen yuvarlak yapar
                   padding: const EdgeInsets.all(20), // Butonun boyutunu ayarlar
@@ -99,6 +133,7 @@ class SignupViewScreen extends StatelessWidget {
 
   TextField _userTxtField() {
     return TextField(
+      controller: _userNameController,
       decoration: InputDecoration(
         icon: const Icon(
           Icons.person_outline_sharp,
@@ -117,6 +152,7 @@ class SignupViewScreen extends StatelessWidget {
 
   TextField _phoneTxtField() {
     return TextField(
+      controller: _phoneController,
       decoration: InputDecoration(
         icon: const Icon(
           Icons.phone_android_outlined,
@@ -135,6 +171,7 @@ class SignupViewScreen extends StatelessWidget {
 
   TextField _emailTxtField() {
     return TextField(
+      controller: _emailControlller,
       decoration: InputDecoration(
         icon: const Icon(
           Icons.mail_outline_outlined,
@@ -153,6 +190,7 @@ class SignupViewScreen extends StatelessWidget {
 
   TextField _passwordTxtField() {
     return TextField(
+      controller: _passwordController,
       decoration: InputDecoration(
         icon: const Icon(
           Icons.lock_outline_rounded,

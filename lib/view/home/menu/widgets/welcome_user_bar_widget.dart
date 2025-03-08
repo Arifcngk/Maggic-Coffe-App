@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:maggic_coffe/provider/auth_provider.dart';
+import 'package:provider/provider.dart';
 
 class WelcomeUserBarWidget extends StatelessWidget {
   const WelcomeUserBarWidget({
@@ -11,6 +13,8 @@ class WelcomeUserBarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+    final user = authProvider.user;
     return Positioned(
       top: MediaQuery.of(context).size.height * 0.02,
       left: 0,
@@ -35,7 +39,7 @@ class WelcomeUserBarWidget extends StatelessWidget {
                   ),
                   const SizedBox(height: 1),
                   Text(
-                    "Alex",
+                    "${user?.username ?? 'Kullanıcı'}",
                     style: GoogleFonts.poppins(
                       fontSize: 20,
                       fontWeight: FontWeight.w500,

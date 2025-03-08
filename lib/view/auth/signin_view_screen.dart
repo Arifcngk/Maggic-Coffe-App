@@ -1,10 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:maggic_coffe/provider/auth_provider.dart';
 import 'package:maggic_coffe/view/auth/signup_view_screen.dart';
 import 'package:maggic_coffe/view/auth/widget/base_text_widget.dart';
+import 'package:provider/provider.dart';
 
-class SigninViewScreen extends StatelessWidget {
+class SigninViewScreen extends StatefulWidget {
   const SigninViewScreen({super.key});
+
+  @override
+  State<SigninViewScreen> createState() => _SigninViewScreenState();
+}
+
+class _SigninViewScreenState extends State<SigninViewScreen> {
+  final _emailControlller = TextEditingController();
+  final _passwordController = TextEditingController();
+  String? _errorMessage;
+
+  // login işlemi yapar
+  Future<void> _login() async {
+    try {
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      await authProvider.login(
+        email: _emailControlller.text,
+        password: _passwordController.text,
+      );
+    } catch (e) {
+      print(e);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString().replaceFirst('Exception: ', ''))),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +52,7 @@ class SigninViewScreen extends StatelessWidget {
             ),
             const SizedBox(height: 50),
             TextField(
+              controller: _emailControlller,
               decoration: InputDecoration(
                 icon: const Icon(
                   Icons.mail_outline_outlined,
@@ -41,6 +69,7 @@ class SigninViewScreen extends StatelessWidget {
             ),
             const SizedBox(height: 30),
             TextField(
+              controller: _passwordController,
               decoration: InputDecoration(
                 icon:
                     const Icon(Icons.lock_outline_rounded, color: Colors.black),
@@ -76,7 +105,7 @@ class SigninViewScreen extends StatelessWidget {
             Align(
               alignment: Alignment.centerRight,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () => _login(),
                 style: ElevatedButton.styleFrom(
                   shape: const CircleBorder(), // Butonu tamamen yuvarlak yapar
                   padding: const EdgeInsets.all(20), // Butonun boyutunu ayarlar

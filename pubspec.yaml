@@ -39,6 +39,9 @@ dependencies:
   font_awesome_flutter: ^10.8.0
   fluentui_system_icons: ^1.1.273
   sliding_up_panel: ^2.0.0+1
+  provider: ^6.1.2
+  http: ^1.3.0
+  shared_preferences: ^2.5.2
 
 dev_dependencies:
   flutter_test:
