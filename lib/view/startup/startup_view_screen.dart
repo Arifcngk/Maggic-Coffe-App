@@ -12,20 +12,20 @@ class StartupViewScreen extends StatefulWidget {
 
 class _StartupViewScreenState extends State<StartupViewScreen> {
   @override
-  void initState() {
-    super.initState();
-    Timer(
-      const Duration(seconds: 3),
-      () {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const SigninViewScreen(),
-          ),
-        );
-      },
-    );
-  }
+  // void initState() {
+  //   super.initState();
+  //   Timer(
+  //     const Duration(seconds: 3),
+  //     () {
+  //       Navigator.pushReplacement(
+  //         context,
+  //         MaterialPageRoute(
+  //           builder: (context) => const SigninViewScreen(),
+  //         ),
+  //       );
+  //     },
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
