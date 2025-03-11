@@ -17,7 +17,7 @@ class _MenuViewScreenState extends State<MenuViewScreen> {
         backgroundColor: Colors.white,
         body: Stack(
           children: [
-            CoffeListWidget(context: context),
+          const  CoffeeListWidget(),
             WelcomeUserBarWidget(context: context),
           ],
         ),

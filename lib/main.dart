@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:maggic_coffe/global_widget/tabbar_global_widget.dart';
 import 'package:maggic_coffe/provider/auth_provider.dart';
+import 'package:maggic_coffe/provider/coffe_provider.dart';
 import 'package:maggic_coffe/view/auth/signin_view_screen.dart';
 import 'package:maggic_coffe/view/home/menu/menu_view_screen.dart';
-import 'package:maggic_coffe/view/rewards/reward_view.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => AuthProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => CoffeeProvider()),
+      ],
       child: const MyApp(),
     ),
   );
@@ -31,8 +35,8 @@ class MyApp extends StatelessWidget {
       home: Consumer<AuthProvider>(
         builder: (context, auth, _) {
           return auth.isAuthenticated
-              ? const BottomBarWidget()
-              : const SigninViewScreen();
+              ? const SigninViewScreen()
+              : const BottomBarWidget();
         },
       ),
     );
