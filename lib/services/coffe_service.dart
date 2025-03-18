@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:maggic_coffe/model/coffe_model.dart';
+import 'package:maggic_coffe/models/coffe_model.dart';
 
 class CoffeeService {
   static const String _baseUrl = 'http://10.0.2.2:8000/api'; // Fiziksel cihaz için IP'nizi güncelleyin

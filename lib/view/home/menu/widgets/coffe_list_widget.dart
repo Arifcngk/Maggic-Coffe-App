@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maggic_coffe/provider/coffe_provider.dart';
-import 'package:maggic_coffe/view/home/menu/widgets/coffe_card_widget.dart';
+import 'package:maggic_coffe/view/home/order_options/view/order_options_view_screen.dart';
 import 'package:provider/provider.dart';
 
 class CoffeeListWidget extends StatefulWidget {
   const CoffeeListWidget({super.key});
 
   @override
-  State<CoffeeListWidget> createState() => _CoffeeListWidgetState(); // Düzeltildi: Coffee
+  State<CoffeeListWidget> createState() => _CoffeeListWidgetState();
 }
 
 class _CoffeeListWidgetState extends State<CoffeeListWidget> {
@@ -17,7 +17,7 @@ class _CoffeeListWidgetState extends State<CoffeeListWidget> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final coffeeProvider = Provider.of<CoffeeProvider>(context, listen: false);
-      coffeeProvider.fetchCoffees(); // İlk yüklemede her zaman çek
+      coffeeProvider.fetchCoffees(); // İlk yüklemede kahve verilerini çek
     });
   }
 
@@ -53,8 +53,7 @@ class _CoffeeListWidgetState extends State<CoffeeListWidget> {
             Expanded(
               child: coffeeProvider.isLoading
                   ? const Center(child: CircularProgressIndicator())
-                  : coffeeProvider.
-                  coffees.isEmpty
+                  : coffeeProvider.coffees.isEmpty
                       ? const Center(
                           child: Text(
                             'Kahve bulunamadı',
@@ -63,7 +62,8 @@ class _CoffeeListWidgetState extends State<CoffeeListWidget> {
                         )
                       : GridView.builder(
                           padding: const EdgeInsets.symmetric(horizontal: 5),
-                          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
                             crossAxisSpacing: 10,
                             mainAxisSpacing: 6,
@@ -71,7 +71,49 @@ class _CoffeeListWidgetState extends State<CoffeeListWidget> {
                           ),
                           itemCount: coffeeProvider.coffees.length,
                           itemBuilder: (context, index) {
-                            return CoffeeCardWidget(index: index,);
+                            final coffee = coffeeProvider.coffees[index]; // 📌 DÜZELTME YAPILDI
+                            return InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        const OrderOptionsViewScreen(),
+                                  ),
+                                );
+                              },
+                              child: Card(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                elevation: 4,
+                                color: Colors.white,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    coffee.imageUrl != null
+                                        ? Image.network(
+                                            'http://10.0.2.2:8000${coffee.imageUrl}',
+                                            width: 120,
+                                            height: 90,
+                                            errorBuilder: (context, error, stackTrace) =>
+                                                const Icon(Icons.error),
+                                          )
+                                        : const Icon(Icons.image_not_supported,
+                                            size: 90),
+                                    const SizedBox(height: 10),
+                                    Text(
+                                      coffee.coffeName,
+                                      style: GoogleFonts.dmSans(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
                           },
                         ),
             ),

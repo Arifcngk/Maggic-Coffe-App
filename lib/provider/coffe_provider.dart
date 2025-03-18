@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:maggic_coffe/model/coffe_model.dart';
+import 'package:maggic_coffe/models/coffe_model.dart';
 import 'package:maggic_coffe/services/coffe_service.dart';
 
 

@@ -23,15 +23,27 @@ class _SignupViewScreenState extends State<SignupViewScreen> {
   Future<void> _register() async {
     try {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      authProvider.register(
+
+      await authProvider.register(
         username: _userNameController.text,
         phone: _phoneController.text,
         email: _emailControlller.text,
         password: _passwordController.text,
       );
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Kayıt Başarılı, Giriş Yapabilirsiniz")),
       );
+
+      // Kayıt başarılıysa Login ekranına yönlendirme
+      Future.delayed(Duration.zero, () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  const SigninViewScreen()), // LoginScreen yerine kendi Login ekranının ismini yaz.
+        );
+      });
     } catch (e) {
       print(e);
       ScaffoldMessenger.of(context).showSnackBar(

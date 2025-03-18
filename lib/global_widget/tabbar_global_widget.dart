@@ -28,55 +28,93 @@ class _BottomBarWidgetState extends State<BottomBarWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _pages[_selectedIndex] is MenuViewScreen
-          ? const Color(0xFF324A59)
-          : Colors.white,
-
-      body: _pages[_selectedIndex], // Seçilen sayfayı göster
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.only(bottom: 30, left: 20, right: 20),
-        child: ClipRRect(
-          borderRadius: const BorderRadius.all(Radius.circular(25)),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: const BorderRadius.all(
-                Radius.circular(25),
+        backgroundColor: _pages[_selectedIndex] is MenuViewScreen
+            ? const Color(0xFF324A59)
+            : Colors.white,
+        body: _pages[_selectedIndex], // Seçilen sayfayı göster
+        bottomNavigationBar: Container(
+          decoration: BoxDecoration(
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF356697).withOpacity(0.1),
+                spreadRadius: 5,
+                blurRadius: 10,
+                offset: const Offset(0, -5),
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
-                  blurRadius: 10,
-                  spreadRadius: 2,
-                  offset: const Offset(0, -3),
-                ),
-              ],
+            ],
+            color: Colors.white,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+          ),
+          child: ClipRRect(
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
             ),
             child: BottomNavigationBar(
-              backgroundColor: Color(0xFFF4F5F7),
-              selectedItemColor: const Color(0xFF324A59), // Seçili ikon rengi
-              unselectedItemColor:
-                  const Color(0xFFD8D8D8), // Seçili olmayan ikon rengi
-              currentIndex: _selectedIndex,
-              onTap: _onItemTapped,
-              items: const [
+              enableFeedback: false,
+              backgroundColor: Colors.white,
+              type: BottomNavigationBarType.fixed,
+              elevation: 0,
+              items: <BottomNavigationBarItem>[
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.coffee_maker_outlined),
+                  icon: Column(
+                    children: [
+                      Image(
+                        image: const AssetImage(
+                          'assets/icon/home.png',
+                        ),
+                        width: 21,
+                        height: 21,
+                        color: _selectedIndex == 0
+                            ? const Color(0xFF324A59)
+                            : const Color(0xFFD8D8D8),
+                      ),
+                    ],
+                  ),
                   label: 'Menu',
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.card_giftcard_rounded),
-                  label: 'Reward',
+                  icon: Column(
+                    children: [
+                      Image(
+                        image: const AssetImage(
+                          'assets/icon/gift.png',
+                        ),
+                        width: 21,
+                        height: 21,
+                        color: _selectedIndex == 1
+                            ? const Color(0xFF324A59)
+                            : const Color(0xFFD8D8D8),
+                      ),
+                    ],
+                  ),
+                  label: 'Gift',
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.account_balance_wallet_outlined),
-                  label: 'My Order',
-                ),
+                    icon: Column(
+                      children: [
+                        Image(
+                          image: const AssetImage(
+                            'assets/icon/order.png',
+                          ),
+                          width: 21,
+                          height: 21,
+                          color: _selectedIndex == 2
+                              ? const Color(0xFF324A59)
+                              : const Color(0xFFD8D8D8),
+                        ),
+                      ],
+                    ),
+                    label: "My Order"),
               ],
+              currentIndex: _selectedIndex,
+              selectedItemColor: Colors.black,
+              onTap: _onItemTapped,
             ),
           ),
-        ),
-      ),
-    );
+        ));
   }
 }
