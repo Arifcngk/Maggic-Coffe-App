@@ -1,0 +1,2 @@
+C:/FlutterProject/maggic_coffe/android/app/.cxx/Debug/5m6x206l/x86_64/CMakeFiles/edit_cache.dir
+C:/FlutterProject/maggic_coffe/android/app/.cxx/Debug/5m6x206l/x86_64/CMakeFiles/rebuild_cache.dir
