@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maggic_coffe/provider/auth_provider.dart';
+import 'package:maggic_coffe/view/profile/profile_view_screen.dart';
 import 'package:provider/provider.dart';
 
 class WelcomeUserBarWidget extends StatelessWidget {
@@ -48,18 +49,38 @@ class WelcomeUserBarWidget extends StatelessWidget {
                   ),
                 ],
               ),
-              const Padding(
-                padding: EdgeInsets.only(bottom: 50, right: 10),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 50, right: 10),
                 child: Row(
                   children: [
-                    Icon(
-                      Icons.shopping_cart_outlined,
-                      size: 28,
+                    Material(
+                      color: Colors.transparent, // Arka plan şeffaf
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ProfileViewScreen(),
+                            ),
+                          );
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.all(
+                              8.0), // dokunma alanı biraz büyüsün
+                          child: Icon(
+                            Icons.person_outline_sharp,
+                            size: 26,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
                     ),
-                    SizedBox(width: 8),
-                    Icon(
-                      Icons.person_3_outlined,
-                      size: 28,
+                    const SizedBox(width: 8),
+                    Image.asset(
+                      "assets/icon/bucket.png",
+                      width: 26,
+                      height: 26,
+                      color: Colors.black,
                     ),
                   ],
                 ),

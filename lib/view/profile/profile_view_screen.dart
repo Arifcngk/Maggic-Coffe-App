@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-class ProfileViewScreen extends StatefulWidget {
+class ProfileViewScreen extends StatelessWidget {
   const ProfileViewScreen({super.key});
 
-  @override
-  State<ProfileViewScreen> createState() => _ProfileViewScreenState();
-}
-
-class _ProfileViewScreenState extends State<ProfileViewScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,12 +15,34 @@ class _ProfileViewScreenState extends State<ProfileViewScreen> {
         child: Column(
           children: [
             ListTile(
-              leading: CircleAvatar(
-                radius: 21,
-                child: Image.asset('assets/images/profile.png'),
+              leading: const CircleAvatar(
+                backgroundColor: Color(0xFFF7F8FB),
+                radius: 22,
+                child: Icon(
+                  Icons.person,
+                  color: Colors.black,
+                  size: 20,
+                ),
               ),
-              title: const Text('Name'),
-              subtitle: const Text('John Doe'),
+              title: Text(
+                'Name',
+                style: GoogleFonts.poppins(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0xFFC1C7D0)),
+              ),
+              subtitle: Text(
+                'Alex',
+                style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF324A59)),
+              ),
+              trailing: Image.asset(
+                "assets/icon/edit.png",
+                width: 20,
+                height: 20,
+              ),
             ),
           ],
         ),

@@ -27,13 +27,14 @@ class AppbarGlobalWidget extends StatelessWidget
         },
       ),
       elevation: 0,
-      actions: const [
+      actions: [
         Padding(
-          padding: EdgeInsets.only(right: 26),
-          child: Icon(
-            Icons.shopping_cart_outlined,
-            size: 24,
-            color: Color(0xFF001833),
+          padding: const EdgeInsets.only(right: 26),
+          child: Image.asset(
+            "assets/icon/bucket.png",
+            width: 26,
+            height: 26,
+            color: Colors.black,
           ),
         ),
       ],

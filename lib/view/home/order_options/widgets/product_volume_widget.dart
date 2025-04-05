@@ -27,11 +27,11 @@ class _ProductVolumeWidgetState extends State<ProductVolumeWidget> {
         const textWidget(txt: "Volume, ml", fontSize: 18),
         Row(
           children: [
-            _drinkVolume(iconSize: 26, mlText: "250", extraSpacing: 14),
-            const SizedBox(width: 10),
+            _drinkVolume(iconSize: 24, mlText: "250", extraSpacing: 14),
+            const SizedBox(width: 14),
             _drinkVolume(iconSize: 30, mlText: "350", extraSpacing: 7),
-            const SizedBox(width: 10),
-            _drinkVolume(iconSize: 38, mlText: "450", extraSpacing: 0),
+            const SizedBox(width: 14),
+            _drinkVolume(iconSize: 36, mlText: "450", extraSpacing: 0),
           ],
         ),
       ],
@@ -52,10 +52,10 @@ class _ProductVolumeWidgetState extends State<ProductVolumeWidget> {
         SizedBox(height: extraSpacing), // Hiza düzeltmesi için
         GestureDetector(
           onTap: () => selectCoffee(volume),
-          child: Icon(
-            FluentIcons.drink_to_go_24_regular,
+          child: Image.asset(
+            "assets/img/drink.png",
+            width: iconSize,
             color: isSelected ? Colors.black : const Color(0xFFD8D8D8),
-            size: iconSize,
           ),
         ),
         const SizedBox(height: 4),
