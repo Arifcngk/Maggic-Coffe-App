@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:maggic_coffe/models/coffe.dart';
 import 'package:maggic_coffe/view/home/order_options/widgets/custom_text_widget.dart';
 
 class ProductRistrettoWidget extends StatefulWidget {
-  const ProductRistrettoWidget({super.key});
+  final Coffee coffee; // Eklendi
+
+  const ProductRistrettoWidget(
+      {super.key, required this.coffee}); // Güncellendi
 
   @override
   State<ProductRistrettoWidget> createState() => _ProductRistrettoWidgetState();
@@ -14,7 +18,7 @@ class _ProductRistrettoWidgetState extends State<ProductRistrettoWidget> {
 
   void _selected(bool x) {
     setState(() {
-      isSelected = x; // ✅ Seçimi doğru güncelle
+      isSelected = x;
     });
   }
 
@@ -23,7 +27,7 @@ class _ProductRistrettoWidgetState extends State<ProductRistrettoWidget> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const textWidget(txt: "Ristretto", fontSize: 18),
+        textWidget(txt: "Ristretto", fontSize: 18), // Düzeltildi
         Row(
           children: [
             _buildOptionButton("One", true),
@@ -35,13 +39,11 @@ class _ProductRistrettoWidgetState extends State<ProductRistrettoWidget> {
     );
   }
 
-  /// ✅ **Container'ı tıklanabilir hale getiren metot**
   Widget _buildOptionButton(String text, bool value) {
     bool isActive = (isSelected == value);
 
     return GestureDetector(
-      onTap: () =>
-          _selected(value), // ✅ Container tıklanınca seçim güncellenecek
+      onTap: () => _selected(value),
       child: Container(
         width: 75,
         height: 30,
@@ -54,11 +56,13 @@ class _ProductRistrettoWidgetState extends State<ProductRistrettoWidget> {
           ),
         ),
         child: Center(
-          child: Text(text,
-              style: GoogleFonts.dmSans(
-                fontSize: 14,
-                color: isActive ? Colors.black : const Color(0xFFD8D8D8),
-              )),
+          child: Text(
+            text,
+            style: GoogleFonts.dmSans(
+              fontSize: 14,
+              color: isActive ? Colors.black : const Color(0xFFD8D8D8),
+            ),
+          ),
         ),
       ),
     );

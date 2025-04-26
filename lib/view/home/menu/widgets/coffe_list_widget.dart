@@ -16,14 +16,20 @@ class _CoffeeListWidgetState extends State<CoffeeListWidget> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final coffeeProvider = Provider.of<CoffeeProvider>(context, listen: false);
-      coffeeProvider.fetchCoffees(); // İlk yüklemede kahve verilerini çek
+      final coffeeProvider =
+          Provider.of<CoffeeProvider>(context, listen: false);
+      print('Fetching coffees...');
+      coffeeProvider.fetchCoffees();
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final coffeeProvider = Provider.of<CoffeeProvider>(context);
+
+    print('Coffee count: ${coffeeProvider.coffees.length}');
+    print('Is loading: ${coffeeProvider.isLoading}');
+    print('Error: ${coffeeProvider.error}');
 
     return Positioned.fill(
       top: MediaQuery.of(context).size.height * 0.1,
@@ -71,14 +77,14 @@ class _CoffeeListWidgetState extends State<CoffeeListWidget> {
                           ),
                           itemCount: coffeeProvider.coffees.length,
                           itemBuilder: (context, index) {
-                            final coffee = coffeeProvider.coffees[index]; // 📌 DÜZELTME YAPILDI
+                            final coffee = coffeeProvider.coffees[index];
                             return InkWell(
                               onTap: () {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
-                                        const OrderOptionsViewScreen(),
+                                        OrderOptionsViewScreen(coffee: coffee),
                                   ),
                                 );
                               },
@@ -91,19 +97,20 @@ class _CoffeeListWidgetState extends State<CoffeeListWidget> {
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    coffee.imageUrl != null
+                                    coffee.imageUrl.isNotEmpty
                                         ? Image.network(
-                                            'http://10.0.2.2:8000${coffee.imageUrl}',
+                                            coffee.imageUrl,
                                             width: 120,
                                             height: 90,
-                                            errorBuilder: (context, error, stackTrace) =>
-                                                const Icon(Icons.error),
+                                            errorBuilder:
+                                                (context, error, stackTrace) =>
+                                                    const Icon(Icons.error),
                                           )
                                         : const Icon(Icons.image_not_supported,
                                             size: 90),
                                     const SizedBox(height: 10),
                                     Text(
-                                      coffee.coffeName,
+                                      coffee.coffeeName,
                                       style: GoogleFonts.dmSans(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w500,

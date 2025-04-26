@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 
 class ImageWidget extends StatelessWidget {
+  final String imageUrl; // Eklendi
+
   const ImageWidget({
     super.key,
+    required this.imageUrl, // Eklendi
   });
 
   @override
@@ -15,9 +18,11 @@ class ImageWidget extends StatelessWidget {
       width: double.infinity,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-        child: Image.asset(
-          "assets/img/latte.png",
+        child: Image.network(
+          imageUrl, // Güncellendi
           fit: BoxFit.contain,
+          errorBuilder: (context, error, stackTrace) =>
+              const Icon(Icons.error), // Hata durumunda ikon
         ),
       ),
     );

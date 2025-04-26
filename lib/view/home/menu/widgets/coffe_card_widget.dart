@@ -17,9 +17,8 @@ class CoffeeCardWidget extends StatelessWidget {
     final coffeeProvider = Provider.of<CoffeeProvider>(context);
 
     // Liste boşsa veya index geçersizse hata önleme
-    if (coffeeProvider.coffees.isEmpty ||
-        index >= coffeeProvider.coffees.length) {
-      return const SizedBox.shrink(); // Boş widget döndür
+    if (coffeeProvider.coffees.isEmpty || index >= coffeeProvider.coffees.length) {
+      return const SizedBox.shrink();
     }
 
     final coffee = coffeeProvider.coffees[index];
@@ -29,7 +28,7 @@ class CoffeeCardWidget extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => const OrderOptionsViewScreen(),
+            builder: (context) => OrderOptionsViewScreen(coffee: coffee),
           ),
         );
       },
@@ -42,9 +41,9 @@ class CoffeeCardWidget extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            coffee.imageUrl != null
+            coffee.imageUrl.isNotEmpty
                 ? Image.network(
-                    'http://10.0.2.2:8000${coffee.imageUrl}',
+                    coffee.imageUrl, // Prefix kaldırıldı, internetten geliyor
                     width: 120,
                     height: 90,
                     errorBuilder: (context, error, stackTrace) =>
@@ -53,7 +52,7 @@ class CoffeeCardWidget extends StatelessWidget {
                 : const Icon(Icons.image_not_supported, size: 90),
             const SizedBox(height: 10),
             Text(
-              coffee.coffeName,
+              coffee.coffeeName, // Düzeltildi: coffeName → coffeeName
               style: GoogleFonts.dmSans(
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
