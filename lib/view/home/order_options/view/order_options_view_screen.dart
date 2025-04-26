@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maggic_coffe/global_widget/appbar_global_widget.dart';
 import 'package:maggic_coffe/models/coffe.dart';
+import 'package:maggic_coffe/view/home/order_options/view/cart_item_view_screen.dart';
 import 'package:maggic_coffe/view/home/order_options/widgets/coffe_lover_card_widget.dart';
 import 'package:maggic_coffe/view/home/order_options/widgets/custom_button_widget.dart';
 import 'package:maggic_coffe/view/home/order_options/widgets/custom_text_widget.dart';
@@ -9,8 +10,8 @@ import 'package:maggic_coffe/view/home/order_options/widgets/image_product_widge
 import 'package:maggic_coffe/view/home/order_options/widgets/onsite_takeaway_widget.dart';
 import 'package:maggic_coffe/view/home/order_options/widgets/product_volume_widget.dart';
 import 'package:maggic_coffe/view/home/order_options/widgets/ristretto_widget.dart';
-import 'package:maggic_coffe/view/home/order_options/widgets/sliding_up_panel_widget.dart';
-import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:maggic_coffe/services/cart_service.dart';
+import 'package:maggic_coffe/models/cart_item.dart';
 
 class OrderOptionsViewScreen extends StatefulWidget {
   final Coffee coffee;
@@ -23,7 +24,8 @@ class OrderOptionsViewScreen extends StatefulWidget {
 
 class _OrderOptionsViewScreenState extends State<OrderOptionsViewScreen> {
   int count = 1;
-  final PanelController _panelController = PanelController();
+  int selectedVolumeMl = 250; // Varsayılan, ProductVolumeWidget’tan alınacak
+  final CartService _cartService = CartService();
 
   void increment() {
     setState(() {
@@ -39,52 +41,68 @@ class _OrderOptionsViewScreenState extends State<OrderOptionsViewScreen> {
     }
   }
 
+  Future<void> addToCart() async {
+    final updatedCoffee = Coffee(
+      coffeeId: widget.coffee.coffeeId,
+      coffeeName: widget.coffee.coffeeName,
+      price: widget.coffee.price,
+      imageUrl: widget.coffee.imageUrl,
+      isHot: widget.coffee.isHot,
+      pointValue: widget.coffee.pointValue,
+      volumeMl: selectedVolumeMl,
+    );
+    print('Sepete eklenen volumeMl: ${updatedCoffee.volumeMl}'); // Test
+    await _cartService.addToCart(
+        CartItem(coffee: updatedCoffee, quantity: count, isTakeaway: false));
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const CartScreen()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final totalPrice = widget.coffee.price * count; // Eklendi
+    final totalPrice = widget.coffee.price * count;
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppbarGlobalWidget(txt: widget.coffee.coffeeName),
-      body: Stack(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
-            child: Column(
-              children: [
-                ImageWidget(imageUrl: widget.coffee.imageUrl),
-                const SizedBox(height: 16),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Column(
-                    children: [
-                      _productQuantity(),
-                      _divider(),
-                      ProductRistrettoWidget(coffee: widget.coffee),
-                      _divider(),
-                      ProductVolumeWidget(coffee: widget.coffee),
-                      _divider(),
-                      OnsiteTakeawayWidget(),
-                      _divider(),
-                      CoffeLoverCardWidget(),
-                      SizedBox(height: MediaQuery.of(context).size.height * 0.06),
-                      _totalBuy(totalPrice), // Güncellendi
-                      SizedBox(height: MediaQuery.of(context).size.height * 0.01),
-                      CustomButtonWidget(
-                        onPressed: () => _panelController.open(),
-                      ),
-                    ],
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+        child: Column(
+          children: [
+            ImageWidget(imageUrl: widget.coffee.imageUrl),
+            const SizedBox(height: 16),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Column(
+                children: [
+                  _productQuantity(),
+                  _divider(),
+                  ProductRistrettoWidget(coffee: widget.coffee),
+                  _divider(),
+                  ProductVolumeWidget(
+                    coffee: widget.coffee,
+                    onVolumeSelected: (volume) {
+                      setState(() {
+                        selectedVolumeMl = volume;
+                      });
+                    },
                   ),
-                ),
-              ],
+                  _divider(),
+                  const OnsiteTakeawayWidget(),
+                  _divider(),
+                  const CoffeLoverCardWidget(),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.06),
+                  _totalBuy(totalPrice),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                  CustomButtonWidget(
+                    onPressed: addToCart, // Sepete ekle
+                  ),
+                ],
+              ),
             ),
-          ),
-          SlidingUpPanelWidget(
-            panelController: _panelController,
-            coffee: widget.coffee, // Eklendi
-            count: count, // Eklendi
-            totalPrice: totalPrice, // Eklendi
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -93,11 +111,14 @@ class _OrderOptionsViewScreenState extends State<OrderOptionsViewScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        textWidget(txt: "Total Amount", fontSize: 20),
+        const textWidget(txt: "Total Amount", fontSize: 20),
         Text(
-          "BYN ${totalPrice.toStringAsFixed(2)}", // Güncellendi
+          "BYN ${totalPrice.toStringAsFixed(2)}",
           style: GoogleFonts.poppins(
-              fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black),
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: Colors.black,
+          ),
         ),
       ],
     );

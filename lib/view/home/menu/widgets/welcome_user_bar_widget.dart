@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maggic_coffe/provider/auth_provider.dart';
 import 'package:maggic_coffe/provider/branch_provider.dart'; // BranchProvider'ı import ettik
+import 'package:maggic_coffe/view/home/order_options/view/cart_item_view_screen.dart';
 import 'package:maggic_coffe/view/profile/profile_view_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -101,11 +102,20 @@ class WelcomeUserBarWidget extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 8),
-                    Image.asset(
-                      "assets/icon/bucket.png",
-                      width: 26,
-                      height: 26,
-                      color: Colors.black,
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => CartScreen(),
+                            ));
+                      },
+                      child: Image.asset(
+                        "assets/icon/bucket.png",
+                        width: 26,
+                        height: 26,
+                        color: Colors.black,
+                      ),
                     ),
                   ],
                 ),

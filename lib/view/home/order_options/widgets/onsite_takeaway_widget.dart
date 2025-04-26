@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:maggic_coffe/view/home/order_options/widgets/custom_text_widget.dart';
 
 class OnsiteTakeawayWidget extends StatefulWidget {
-  const OnsiteTakeawayWidget({super.key});
+  final Function(bool)? onSelectionChanged; // burası eklendi
+
+  const OnsiteTakeawayWidget({super.key, this.onSelectionChanged});
 
   @override
   State<OnsiteTakeawayWidget> createState() => _OnsiteTakeawayWidgetState();
@@ -16,6 +18,7 @@ class _OnsiteTakeawayWidgetState extends State<OnsiteTakeawayWidget> {
     setState(() {
       selected = isOnsite;
     });
+    widget.onSelectionChanged?.call(isOnsite); // burada callback'i çağırıyoruz
   }
 
   @override

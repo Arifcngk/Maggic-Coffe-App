@@ -4,27 +4,33 @@ import 'package:maggic_coffe/models/coffe.dart';
 import 'package:maggic_coffe/view/home/order_options/widgets/custom_text_widget.dart';
 
 class ProductVolumeWidget extends StatefulWidget {
-  final Coffee coffee; // Eklendi
+  final Coffee coffee;
+  final Function(int) onVolumeSelected; // Eklendi
 
-  const ProductVolumeWidget({super.key, required this.coffee}); // Güncellendi
+  const ProductVolumeWidget({
+    super.key,
+    required this.coffee,
+    required this.onVolumeSelected, // Eklendi
+  });
 
   @override
   State<ProductVolumeWidget> createState() => _ProductVolumeWidgetState();
 }
 
 class _ProductVolumeWidgetState extends State<ProductVolumeWidget> {
-  late int selectedVolume; // coffee.volumeMl’den başlatılacak
+  late int selectedVolume;
 
   @override
   void initState() {
     super.initState();
-    selectedVolume = widget.coffee.volumeMl; // coffee’den al
+    selectedVolume = widget.coffee.volumeMl!;
   }
 
   void selectCoffee(int volume) {
     setState(() {
       selectedVolume = volume;
     });
+    widget.onVolumeSelected(volume); // Callback’i çağır
   }
 
   @override
@@ -32,7 +38,7 @@ class _ProductVolumeWidgetState extends State<ProductVolumeWidget> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        textWidget(txt: "Volume, ml", fontSize: 18), // Düzeltildi
+        textWidget(txt: "Volume, ml", fontSize: 18),
         Row(
           children: [
             _drinkVolume(iconSize: 24, mlText: "250", extraSpacing: 14),
