@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:maggic_coffe/models/coffe.dart';
+import 'package:maggic_coffe/models/coffee.dart';
 import 'package:maggic_coffe/view/home/order_options/widgets/custom_text_widget.dart';
 
 class ProductVolumeWidget extends StatefulWidget {

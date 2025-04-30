@@ -6,6 +6,7 @@ const coffeeRoutes = require("./routes/coffee");
 const creditCardRoutes = require("./routes/creditcard");
 const branchRoutes = require("./routes/branch");
 const orderRoutes = require("./routes/orders"); // Yeni rota
+const loyaltyRoutes = require("./routes/loyalty"); // Yeni rota
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ app.use("/api", coffeeRoutes);
 app.use("/api", branchRoutes);
 app.use("/api", creditCardRoutes);
 app.use("/api/orders", orderRoutes); // Yeni rota
+app.use("/api/loyalty", loyaltyRoutes); // Yeni rota
 
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

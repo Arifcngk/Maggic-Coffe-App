@@ -17,7 +17,8 @@ class CoffeeCardWidget extends StatelessWidget {
     final coffeeProvider = Provider.of<CoffeeProvider>(context);
 
     // Liste boşsa veya index geçersizse hata önleme
-    if (coffeeProvider.coffees.isEmpty || index >= coffeeProvider.coffees.length) {
+    if (coffeeProvider.coffees.isEmpty ||
+        index >= coffeeProvider.coffees.length) {
       return const SizedBox.shrink();
     }
 

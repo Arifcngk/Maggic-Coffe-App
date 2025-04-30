@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:maggic_coffe/global_widget/appbar_global_widget.dart';
-import 'package:maggic_coffe/models/coffe.dart';
+import 'package:maggic_coffe/models/coffee.dart';
 import 'package:maggic_coffe/view/home/order_options/view/cart_item_view_screen.dart';
 import 'package:maggic_coffe/view/home/order_options/widgets/coffe_lover_card_widget.dart';
 import 'package:maggic_coffe/view/home/order_options/widgets/custom_button_widget.dart';
@@ -24,7 +24,8 @@ class OrderOptionsViewScreen extends StatefulWidget {
 
 class _OrderOptionsViewScreenState extends State<OrderOptionsViewScreen> {
   int count = 1;
-  int selectedVolumeMl = 250; // Varsayılan, ProductVolumeWidget’tan alınacak
+  int selectedVolumeMl = 250;
+  bool isTakeaway = false;
   final CartService _cartService = CartService();
 
   void increment() {
@@ -42,27 +43,27 @@ class _OrderOptionsViewScreenState extends State<OrderOptionsViewScreen> {
   }
 
   Future<void> addToCart() async {
-    final updatedCoffee = Coffee(
-      coffeeId: widget.coffee.coffeeId,
-      coffeeName: widget.coffee.coffeeName,
-      price: widget.coffee.price,
-      imageUrl: widget.coffee.imageUrl,
-      isHot: widget.coffee.isHot,
-      pointValue: widget.coffee.pointValue,
+    final cartItem = CartItem(
+      coffee: widget.coffee,
+      quantity: count,
       volumeMl: selectedVolumeMl,
+      isTakeaway: isTakeaway,
+      intensity: 'light', // Varsayılan değer
     );
-    print('Sepete eklenen volumeMl: ${updatedCoffee.volumeMl}'); // Test
-    await _cartService.addToCart(
-        CartItem(coffee: updatedCoffee, quantity: count, isTakeaway: false));
+
+    _cartService.addItem(cartItem);
+    if (!mounted) return;
+
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const CartScreen()),
+      MaterialPageRoute(builder: (context) => const CartItemViewScreen()),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final totalPrice = widget.coffee.price * count;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppbarGlobalWidget(txt: widget.coffee.coffeeName),
@@ -89,14 +90,20 @@ class _OrderOptionsViewScreenState extends State<OrderOptionsViewScreen> {
                     },
                   ),
                   _divider(),
-                  const OnsiteTakeawayWidget(),
+                  OnsiteTakeawayWidget(
+                    onSelectionChanged: (value) {
+                      setState(() {
+                        isTakeaway = value;
+                      });
+                    },
+                  ),
                   _divider(),
                   const CoffeLoverCardWidget(),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.06),
                   _totalBuy(totalPrice),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.01),
                   CustomButtonWidget(
-                    onPressed: addToCart, // Sepete ekle
+                    onPressed: addToCart,
                   ),
                 ],
               ),

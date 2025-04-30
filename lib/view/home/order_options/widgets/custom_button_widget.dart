@@ -2,9 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class CustomButtonWidget extends StatelessWidget {
-  final VoidCallback onPressed; // Future<void> yerine VoidCallback
+  final VoidCallback onPressed;
+  final String text;
 
-  const CustomButtonWidget({super.key, required this.onPressed});
+  const CustomButtonWidget({
+    super.key,
+    required this.onPressed,
+    this.text = "Sepete Ekle",
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +25,7 @@ class CustomButtonWidget extends StatelessWidget {
           ),
           child: Center(
             child: Text(
-              "Sepete Ekle", // Next → Sepete Ekle
+              text,
               style: GoogleFonts.poppins(
                 fontWeight: FontWeight.w600,
                 fontSize: 16,

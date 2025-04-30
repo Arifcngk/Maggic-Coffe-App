@@ -1,181 +1,209 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:maggic_coffe/global_widget/appbar_global_widget.dart';
 import 'package:maggic_coffe/models/cart_item.dart';
 import 'package:maggic_coffe/services/cart_service.dart';
-import 'package:sliding_up_panel/sliding_up_panel.dart';
+import 'package:maggic_coffe/services/branch_service.dart';
+import 'package:maggic_coffe/view/home/order_options/view/checkout_screen.dart';
 
-class CartScreen extends StatefulWidget {
-  const CartScreen({super.key});
+class CartItemViewScreen extends StatefulWidget {
+  const CartItemViewScreen({super.key});
 
   @override
-  _CartScreenState createState() => _CartScreenState();
+  State<CartItemViewScreen> createState() => _CartItemViewScreenState();
 }
 
-class _CartScreenState extends State<CartScreen> {
+class _CartItemViewScreenState extends State<CartItemViewScreen> {
   final CartService _cartService = CartService();
+  final BranchService _branchService = BranchService();
   List<CartItem> _cartItems = [];
-  bool _isLoading = false;
+  bool _isLoading = true;
+  bool _isBranchLoading = true;
+  int? _selectedBranchId;
 
   @override
   void initState() {
     super.initState();
+    print('CartScreen: initState çağrıldı');
     _fetchCart();
+    _getSelectedBranch();
   }
 
-  Future<void> _fetchCart() async {
-    setState(() => _isLoading = true);
+  Future<void> _getSelectedBranch() async {
     try {
-      final cartItems = await _cartService.getCart();
+      final branch = await BranchService().getSelectedBranch();
       setState(() {
-        _cartItems = cartItems;
-        _isLoading = false;
+        _selectedBranchId = branch?['branch_id'];
+        _isBranchLoading = false;
       });
     } catch (e) {
-      setState(() => _isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Sepet yüklenemedi: $e')),
-      );
+      print('Error getting selected branch: $e');
+      setState(() {
+        _isBranchLoading = false;
+      });
     }
   }
 
+  Future<void> _fetchCart() async {
+    print('CartScreen: _fetchCart çağrıldı');
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      _cartItems = await _cartService.getCart();
+      print('CartScreen: Sepet yüklendi: $_cartItems');
+    } catch (e) {
+      print('CartScreen: Sepet yüklenirken hata: $e');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _updateQuantity(CartItem item, int newQuantity) {
+    if (newQuantity > 0) {
+      setState(() {
+        item.quantity = newQuantity;
+      });
+    } else {
+      _removeItem(item);
+    }
+  }
+
+  void _removeItem(CartItem item) {
+    setState(() {
+      _cartService.removeItem(item);
+      _cartItems.remove(item);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    final totalPrice = _cartService.getTotalPrice(_cartItems);
+    print('CartScreen: build çağrıldı, _cartItems: $_cartItems');
     return Scaffold(
-      appBar: AppBar(title: const Text('Sepetim')),
-      body: _isLoading
+      appBar: AppbarGlobalWidget(txt: 'Sepetim'),
+      body: _isLoading || _isBranchLoading
           ? const Center(child: CircularProgressIndicator())
           : _cartItems.isEmpty
-              ? const Center(child: Text('Sepet boş'))
-              : ListView.builder(
-                  itemCount: _cartItems.length,
-                  itemBuilder: (context, index) {
-                    final item = _cartItems[index];
-                    return ListTile(
-                      title: Text(item.coffee.coffeeName),
-                      subtitle: Text(
-                        'Adet: ${item.quantity} | Fiyat: ${(item.totalPrice).toStringAsFixed(2)} TL | ${item.isTakeaway ? 'Takeaway' : 'Onsite'} | Yoğunluk: ${item.coffee.intensity ?? 'light'}',
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.shopping_cart_outlined, size: 64),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Sepetiniz boş',
+                        style: GoogleFonts.poppins(fontSize: 18),
                       ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
+                    ],
+                  ),
+                )
+              : Column(
+                  children: [
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: _cartItems.length,
+                        itemBuilder: (context, index) {
+                          final item = _cartItems[index];
+                          return Card(
+                            margin: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
+                            child: ListTile(
+                              leading: Image.network(
+                                item.coffee.imageUrl,
+                                width: 50,
+                                height: 50,
+                                fit: BoxFit.cover,
+                              ),
+                              title: Text(item.coffee.coffeeName),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text('${item.volumeMl}ml'),
+                                  Text(
+                                      '${item.isTakeaway ? 'Paket' : 'Mekan'} - ${item.intensity}'),
+                                ],
+                              ),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.remove),
+                                    onPressed: () => _updateQuantity(
+                                        item, item.quantity - 1),
+                                  ),
+                                  Text('${item.quantity}'),
+                                  IconButton(
+                                    icon: const Icon(Icons.add),
+                                    onPressed: () => _updateQuantity(
+                                        item, item.quantity + 1),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete),
+                                    onPressed: () => _removeItem(item),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
                         children: [
-                          IconButton(
-                            icon: const Icon(Icons.remove, color: Color(0xFF001833)),
-                            onPressed: () async {
-                              await _cartService.updateQuantity(
-                                item.coffee.coffeeId,
-                                item.isTakeaway, // Ekledik
-                                item.quantity - 1,
-                              );
-                              await _fetchCart();
-                            },
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Toplam',
+                                style: GoogleFonts.poppins(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              Text(
+                                '${_cartService.getTotalPrice(_cartItems).toStringAsFixed(2)} TL',
+                                style: GoogleFonts.poppins(
+                                    fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                            ],
                           ),
-                          Text('${item.quantity}'),
-                          IconButton(
-                            icon: const Icon(Icons.add, color: Color(0xFF001833)),
-                            onPressed: () async {
-                              await _cartService.updateQuantity(
-                                item.coffee.coffeeId,
-                                item.isTakeaway, // Ekledik
-                                item.quantity + 1,
-                              );
-                              await _fetchCart();
-                            },
+                          const SizedBox(height: 16),
+                          ElevatedButton(
+                            onPressed: _selectedBranchId == null
+                                ? null
+                                : () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => CheckoutScreen(
+                                          branchId: _selectedBranchId!,
+                                          cartItems: _cartItems,
+                                          totalPrice: _cartService
+                                              .getTotalPrice(_cartItems),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF001833),
+                              minimumSize: const Size(double.infinity, 50),
+                            ),
+                            child: Text(
+                              _selectedBranchId == null
+                                  ? 'Şube bilgisi yükleniyor...'
+                                  : 'Ödemeye Geç',
+                              style: GoogleFonts.poppins(
+                                  fontSize: 16, color: Colors.white),
+                            ),
                           ),
                         ],
                       ),
-                    );
-                  },
+                    ),
+                  ],
                 ),
-      bottomSheet: SlidingUpPanelWidget(
-        panelController: PanelController(),
-        cartItems: _cartItems,
-        totalPrice: totalPrice,
-      ),
-    );
-  }
-}
-
-class SlidingUpPanelWidget extends StatelessWidget {
-  final PanelController panelController;
-  final List<CartItem> cartItems;
-  final double totalPrice;
-
-  const SlidingUpPanelWidget({
-    super.key,
-    required this.panelController,
-    required this.cartItems,
-    required this.totalPrice,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SlidingUpPanel(
-      controller: panelController,
-      minHeight: 0,
-      maxHeight: MediaQuery.of(context).size.height * 0.8,
-      panel: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Text('Toplam: ${totalPrice.toStringAsFixed(2)} TL'),
-            const SizedBox(height: 20),
-            // TODO: Kart seçimi UI
-            ElevatedButton(
-              onPressed: () async {
-                try {
-                  final cartService = CartService();
-                  const branchId = 1; // TODO: Şube seçimi
-                  const cardId = 1; // TODO: Seçilen kart
-                  const token =
-                      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiaWF0IjoxNzQ1NjU2Nzc1LCJleHAiOjE3NDU2NjAzNzV9.36XMdEXHfwuD05-woaWfqJW-fD19meKqziAzsDKiljg';
-                  await cartService.createOrder(
-                    cartItems: cartItems,
-                    branchId: branchId,
-                    cardId: cardId,
-                    token: token,
-                  );
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const OrderIsConfirmedView()),
-                  );
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Sipariş başarısız: $e')),
-                  );
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF001833),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                minimumSize: const Size(double.infinity, 52),
-              ),
-              child: Text(
-                'Pay Now',
-                style: GoogleFonts.poppins(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class OrderIsConfirmedView extends StatelessWidget {
-  const OrderIsConfirmedView({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Sipariş Onaylandı')),
-      body: const Center(child: Text('Siparişiniz alındı!')),
     );
   }
 }

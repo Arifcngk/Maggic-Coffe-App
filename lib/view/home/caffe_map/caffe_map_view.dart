@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:maggic_coffe/global_widget/tabbar_global_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:maggic_coffe/provider/branch_provider.dart';
+import 'package:maggic_coffe/services/branch_service.dart';
 
 class CoffeMapViewScreen extends StatefulWidget {
   const CoffeMapViewScreen({super.key});
@@ -128,9 +129,17 @@ class _CoffeMapViewScreenState extends State<CoffeMapViewScreen> {
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600),
                                 ),
-                                onTap: () {
+                                onTap: () async {
                                   // Şube seçildiğinde, BranchProvider'a kaydediyoruz
                                   provider.selectBranch(branch);
+                                  // Seçilen şubeyi SharedPreferences'a kaydediyoruz
+                                  await BranchService().setSelectedBranch({
+                                    'branch_id': branch['branch_id'],
+                                    'branch_name': branch['branch_name'],
+                                    'branch_address':
+                                        branch['branch_address'] ??
+                                            'No address provided'
+                                  });
                                   // Şube seçildikten sonra BottomBarWidget'a yönlendiriyoruz
                                   Navigator.pushReplacement(
                                     context,

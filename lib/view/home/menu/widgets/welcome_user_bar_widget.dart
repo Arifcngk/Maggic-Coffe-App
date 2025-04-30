@@ -107,7 +107,7 @@ class WelcomeUserBarWidget extends StatelessWidget {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => CartScreen(),
+                              builder: (context) => const CartItemViewScreen(),
                             ));
                       },
                       child: Image.asset(

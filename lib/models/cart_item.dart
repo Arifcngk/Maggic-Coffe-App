@@ -1,39 +1,44 @@
-import 'package:maggic_coffe/models/coffe.dart';
-
+import 'coffee.dart';
 
 class CartItem {
   final Coffee coffee;
   int quantity;
-  final bool isTakeaway; // Yeni alan
+  final int volumeMl;
+  final bool isTakeaway;
+  final String intensity;
 
   CartItem({
     required this.coffee,
     required this.quantity,
+    required this.volumeMl,
     required this.isTakeaway,
+    this.intensity = 'light',
   });
 
-  double get totalPrice => coffee.price * quantity;
+  double get totalPrice => quantity * coffee.price;
+
+  Map<String, dynamic> toJson() {
+    return {
+      'coffee': coffee.toJson(),
+      'quantity': quantity,
+      'volume_ml': volumeMl,
+      'is_takeaway': isTakeaway,
+      'intensity': intensity,
+    };
+  }
 
   factory CartItem.fromJson(Map<String, dynamic> json) {
     return CartItem(
       coffee: Coffee.fromJson(json['coffee']),
-      quantity: json['quantity'] as int,
-      isTakeaway: json['is_takeaway'] as bool? ?? false, // Varsayılan false
+      quantity: json['quantity'],
+      volumeMl: json['volume_ml'],
+      isTakeaway: json['is_takeaway'],
+      intensity: json['intensity'] ?? 'light',
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    final json = {
-      'coffee': coffee.toJson(),
-      'quantity': quantity,
-      'is_takeaway': isTakeaway,
-    };
-    print('CartItem toJson: $json');
-    return json;
   }
 
   @override
   String toString() {
-    return 'CartItem(coffee: ${coffee.toJson()}, quantity: $quantity, is_takeaway: $isTakeaway)';
+    return 'CartItem(coffee: ${coffee.toJson()}, quantity: $quantity, volume_ml: $volumeMl, is_takeaway: $isTakeaway, intensity: $intensity)';
   }
 }

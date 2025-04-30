@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:maggic_coffe/models/coffe.dart';
+import 'package:maggic_coffe/models/coffee.dart';
 import 'package:maggic_coffe/services/coffe_service.dart';
-
 
 class CoffeeProvider with ChangeNotifier {
   List<Coffee> _coffees = [];
@@ -21,6 +20,9 @@ class CoffeeProvider with ChangeNotifier {
 
     try {
       _coffees = await _coffeeService.getCoffees();
+      if (_coffees.isEmpty) {
+        _error = 'Kahve bulunamadı';
+      }
     } catch (e) {
       _error = e.toString();
     } finally {
