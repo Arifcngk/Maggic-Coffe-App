@@ -153,8 +153,30 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             Center(
                               child: Column(
                                 children: [
-                                  const Text(
-                                      'Kayıtlı kartınız bulunmamaktadır.'),
+                                  Container(
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFF7F8FB),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        const Icon(
+                                          Icons.credit_card_off,
+                                          size: 48,
+                                          color: Color(0xFF001833),
+                                        ),
+                                        const SizedBox(height: 16),
+                                        Text(
+                                          'Kayıtlı kartınız bulunmamaktadır',
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 16,
+                                            color: const Color(0xFF001833),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                   const SizedBox(height: 16),
                                   ElevatedButton(
                                     onPressed: () async {
@@ -169,7 +191,22 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                         _loadData();
                                       }
                                     },
-                                    child: const Text('Yeni Kart Ekle'),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFF001833),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(30),
+                                      ),
+                                      minimumSize: const Size(200, 52),
+                                      elevation: 2,
+                                    ),
+                                    child: Text(
+                                      'Yeni Kart Ekle',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
+                                      ),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -177,11 +214,33 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           else
                             Column(
                               children: [
-                                ..._creditCards.map((card) => Card(
+                                ..._creditCards.map((card) => Container(
+                                      margin: const EdgeInsets.only(bottom: 12),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFF7F8FB),
+                                        borderRadius: BorderRadius.circular(12),
+                                        border: Border.all(
+                                          color: _selectedCardId == card.cardId
+                                              ? const Color(0xFF001833)
+                                              : Colors.transparent,
+                                          width: 2,
+                                        ),
+                                      ),
                                       child: RadioListTile<int>(
-                                        title: Text(card.cardTitle),
+                                        title: Text(
+                                          card.cardTitle,
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500,
+                                            color: const Color(0xFF001833),
+                                          ),
+                                        ),
                                         subtitle: Text(
                                           '**** **** **** ${card.cardNumber.substring(card.cardNumber.length - 4)}',
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 14,
+                                            color: const Color(0xFF001833),
+                                          ),
                                         ),
                                         value: card.cardId,
                                         groupValue: _selectedCardId,
@@ -190,6 +249,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                             _selectedCardId = value;
                                           });
                                         },
+                                        activeColor: const Color(0xFF001833),
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                          horizontal: 16,
+                                          vertical: 8,
+                                        ),
                                       ),
                                     )),
                                 const SizedBox(height: 16),
@@ -206,7 +271,22 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                       _loadData();
                                     }
                                   },
-                                  child: const Text('Yeni Kart Ekle'),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF001833),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30),
+                                    ),
+                                    minimumSize: const Size(200, 52),
+                                    elevation: 2,
+                                  ),
+                                  child: Text(
+                                    'Yeni Kart Ekle',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
@@ -219,14 +299,28 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             ),
                           ),
                           const SizedBox(height: 16),
-                          ..._cartService.items.map((item) => ListTile(
-                                title: Text(item.coffee.coffeeName),
-                                subtitle: Text(
-                                    '${item.quantity} x ${item.coffee.price} BYN'),
-                                trailing: Text(
-                                  '${(item.quantity * item.coffee.price).toStringAsFixed(2)} BYN',
-                                ),
-                              )),
+                          ..._cartService.items.map((item) {
+                            double basePrice = item.coffee.price;
+                            double volumePrice = 0;
+
+                            if (item.volumeMl == 350) {
+                              volumePrice = 10;
+                            } else if (item.volumeMl == 450) {
+                              volumePrice = 20;
+                            }
+
+                            double totalItemPrice =
+                                item.quantity * (basePrice + volumePrice);
+
+                            return ListTile(
+                              title: Text(item.coffee.coffeeName),
+                              subtitle: Text(
+                                  '${item.quantity} x ${(basePrice + volumePrice).toStringAsFixed(2)} BYN (${item.volumeMl}ml)'),
+                              trailing: Text(
+                                '${totalItemPrice.toStringAsFixed(2)} BYN',
+                              ),
+                            );
+                          }),
                           const Divider(),
                           ListTile(
                             title: Text(

@@ -62,7 +62,17 @@ class _OrderOptionsViewScreenState extends State<OrderOptionsViewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final totalPrice = widget.coffee.price * count;
+    double basePrice = widget.coffee.price;
+    double volumePrice = 0;
+
+    // Add price differences based on volume
+    if (selectedVolumeMl == 350) {
+      volumePrice = 10; // 10 TL extra for 350ml
+    } else if (selectedVolumeMl == 450) {
+      volumePrice = 20; // 20 TL extra for 450ml
+    }
+
+    final totalPrice = (basePrice + volumePrice) * count;
 
     return Scaffold(
       backgroundColor: Colors.white,

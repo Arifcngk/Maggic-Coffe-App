@@ -60,7 +60,7 @@ exports.createOrder = async (req, res) => {
             item.volume_ml,
             item.is_takeaway ? "takeaway" : "onsite",
             item.intensity || "light",
-            "preparing",
+            "pending",
             barista_id,
           ]
         );
@@ -114,7 +114,7 @@ exports.createOrder = async (req, res) => {
 };
 
 exports.getBranchOrders = async (req, res) => {
-  const { branch_id, status = "preparing" } = req.query;
+  const { branch_id, status = "pending" } = req.query;
 
   try {
     if (!branch_id) {

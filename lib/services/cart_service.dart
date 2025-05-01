@@ -12,8 +12,19 @@ class CartService {
   List<CartItem> get items => _items;
 
   double getTotalPrice(List<CartItem> items) {
-    return items.fold(
-        0, (sum, item) => sum + (item.quantity * item.coffee.price));
+    return items.fold(0, (sum, item) {
+      double basePrice = item.coffee.price;
+      double volumePrice = 0;
+
+      // Add price differences based on volume
+      if (item.volumeMl == 350) {
+        volumePrice = 10; // 10 TL extra for 350ml
+      } else if (item.volumeMl == 450) {
+        volumePrice = 20; // 20 TL extra for 450ml
+      }
+
+      return sum + (item.quantity * (basePrice + volumePrice));
+    });
   }
 
   Future<List<CartItem>> getCart() async {
