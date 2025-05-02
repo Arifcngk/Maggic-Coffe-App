@@ -96,3 +96,88 @@ exports.updatePoints = async (req, res) => {
       .json({ message: "Puan güncellenemedi", error: error.message });
   }
 };
+
+// Bedava kahve kullanma
+exports.redeemFreeCoffee = async (req, res) => {
+  const userId = req.user.id;
+  const { coffee_id, branch_id } = req.body;
+  const FREE_COFFEE_POINTS = 250;
+
+  try {
+    // Kullanıcının puanlarını kontrol et
+    const [points] = await pool.query(
+      "SELECT total_points FROM user_points WHERE user_id = ?",
+      [userId]
+    );
+
+    if (points.length === 0 || points[0].total_points < FREE_COFFEE_POINTS) {
+      return res.status(400).json({
+        message: "Yeterli puanınız bulunmamaktadır",
+        required_points: FREE_COFFEE_POINTS,
+        current_points: points[0]?.total_points || 0,
+      });
+    }
+
+    // Transaction başlat
+    await pool.query("START TRANSACTION");
+
+    try {
+      // Şubedeki baristaları al
+      const [baristas] = await pool.query(
+        "SELECT barista_id FROM baristas WHERE branch_id = ?",
+        [branch_id]
+      );
+
+      if (baristas.length === 0) {
+        throw new Error("Bu şubede barista bulunamadı");
+      }
+
+      // Rastgele bir barista seç
+      const randomBarista =
+        baristas[Math.floor(Math.random() * baristas.length)];
+
+      // Puanları güncelle
+      await pool.query(
+        `UPDATE user_points 
+         SET total_points = total_points - ? 
+         WHERE user_id = ?`,
+        [FREE_COFFEE_POINTS, userId]
+      );
+
+      // Bedava kahve siparişini oluştur
+      const [orderResult] = await pool.query(
+        `INSERT INTO orders (user_id, branch_id, total_price, status, barista_id) 
+         VALUES (?, ?, 0, 'completed', ?)`,
+        [userId, branch_id, randomBarista.barista_id]
+      );
+
+      const orderId = orderResult.insertId;
+
+      // Branch orders'a ekle
+      await pool.query(
+        `INSERT INTO branch_orders 
+         (order_id, branch_id, coffee_id, quantity, price, selected_volume_ml, delivery_type, intensity, status, barista_id) 
+         VALUES (?, ?, ?, 1, 0, 250, 'onsite', 'light', 'completed', ?)`,
+        [orderId, branch_id, coffee_id, randomBarista.barista_id]
+      );
+
+      // Transaction'ı onayla
+      await pool.query("COMMIT");
+
+      res.status(200).json({
+        message: "Bedava kahveniz başarıyla kullanıldı",
+        remaining_points: points[0].total_points - FREE_COFFEE_POINTS,
+      });
+    } catch (error) {
+      // Hata durumunda transaction'ı geri al
+      await pool.query("ROLLBACK");
+      throw error;
+    }
+  } catch (error) {
+    console.error("Bedava kahve kullanma hatası:", error);
+    res.status(500).json({
+      message: "Bedava kahve kullanılamadı",
+      error: error.message,
+    });
+  }
+};

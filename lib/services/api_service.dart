@@ -92,6 +92,31 @@ class ApiService {
     }
   }
 
+  // Bedava kahve kullan
+  static Future<Map<String, dynamic>> redeemFreeCoffee(
+      int coffeeId, int branchId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/loyalty/redeem-free-coffee'),
+        headers: await _getHeaders(),
+        body: json.encode({
+          'coffee_id': coffeeId,
+          'branch_id': branchId,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else {
+        final errorData = json.decode(response.body);
+        throw Exception(errorData['message'] ?? 'Bedava kahve kullanılamadı');
+      }
+    } catch (e) {
+      print('Error in redeemFreeCoffee: $e');
+      rethrow;
+    }
+  }
+
   // Sipariş API'leri
   static Future<Map<String, dynamic>> createOrder({
     required List<Map<String, dynamic>> items,

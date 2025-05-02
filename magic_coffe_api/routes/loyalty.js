@@ -1,21 +1,24 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const loyaltyController = require('../controller/loyaltyController');
-const authMiddleware = require('../middleware/authMiddleware');
+const loyaltyController = require("../controller/loyaltyController");
+const authMiddleware = require("../middleware/authMiddleware");
 
 // Tüm route'lar için authentication gerekli
 router.use(authMiddleware);
 
 // Kullanıcı puanlarını getir
-router.get('/points', loyaltyController.getUserPoints);
+router.get("/points", loyaltyController.getUserPoints);
 
 // Haftalık sipariş sayısını getir
-router.get('/weekly-orders', loyaltyController.getWeeklyOrderCount);
+router.get("/weekly-orders", loyaltyController.getWeeklyOrderCount);
 
 // Kahve geçmişini getir
-router.get('/history', loyaltyController.getCoffeeHistory);
+router.get("/history", loyaltyController.getCoffeeHistory);
+
+// Bedava kahve kullan
+router.post("/redeem-free-coffee", loyaltyController.redeemFreeCoffee);
 
 // Puanları güncelle
-router.post('/update-points', loyaltyController.updatePoints);
+router.post("/update-points", loyaltyController.updatePoints);
 
-module.exports = router; 
+module.exports = router;
