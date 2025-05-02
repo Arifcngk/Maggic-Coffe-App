@@ -46,6 +46,10 @@ class _LoyaltyScreenState extends State<LoyaltyScreen> {
       print('Loading coffee history...');
       final historyData = await ApiService.getCoffeeHistory();
       print('History data: $historyData');
+      print(
+          'First item in history: ${historyData.isNotEmpty ? historyData[0] : 'No data'}');
+      print(
+          'Point value of first item: ${historyData.isNotEmpty ? historyData[0]['point_value'] : 'No data'}');
 
       setState(() {
         _totalPoints = pointsData['total_points'] ?? 0;
@@ -75,24 +79,28 @@ class _LoyaltyScreenState extends State<LoyaltyScreen> {
       appBar: const AppbarGlobalWidget(txt: 'Sadakat Programı'),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : RefreshIndicator(
-              onRefresh: _loadData,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Puan Kartı
-                    _buildPointsCard(),
-                    SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                    // Haftalık Siparişler
-                    _buildWeeklyOrders(),
-                    SizedBox(height: MediaQuery.of(context).size.height * 0.02),
-                    // Kahve Geçmişi
-                    _buildCoffeeHistory(),
-                  ],
+          : SafeArea(
+              child: RefreshIndicator(
+                onRefresh: _loadData,
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 25, vertical: 10),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Puan Kartı
+                      _buildPointsCard(),
+                      SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.02),
+                      // Haftalık Siparişler
+                      _buildWeeklyOrders(),
+                      SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.02),
+                      // Kahve Geçmişi
+                      _buildCoffeeHistory(),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -142,13 +150,13 @@ class _LoyaltyScreenState extends State<LoyaltyScreen> {
               ),
               const SizedBox(height: 16),
               LinearProgressIndicator(
-                value: (_totalPoints % 1000) / 1000,
+                value: (_totalPoints % 250) / 250,
                 backgroundColor: Colors.white.withOpacity(0.2),
                 valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
               ),
               const SizedBox(height: 8),
               Text(
-                '${1000 - (_totalPoints % 1000)} puan sonra ücretsiz kahve!',
+                '${250 - (_totalPoints % 250)} puan sonra ücretsiz kahve!',
                 style: GoogleFonts.poppins(
                   color: Colors.white.withOpacity(0.8),
                   fontSize: 12,
@@ -165,13 +173,26 @@ class _LoyaltyScreenState extends State<LoyaltyScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Haftalık Siparişler',
-          style: GoogleFonts.poppins(
-            fontSize: 14,
-            color: const Color(0xFF324A59),
-            fontWeight: FontWeight.w500,
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Haftalık Siparişler',
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                color: const Color(0xFF324A59),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            Text(
+              '$_weeklyOrderCount/7',
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                color: const Color(0xFF324A59),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 16),
         Container(
@@ -179,17 +200,43 @@ class _LoyaltyScreenState extends State<LoyaltyScreen> {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: const Color(0xFF324A59).withOpacity(0.2),
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF324A59).withOpacity(0.1),
+                blurRadius: 4,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: List.generate(7, (index) {
               final isActive = index < _weeklyOrderCount;
-              return Image.asset(
-                isActive
-                    ? "assets/img/coffe_cupe.png"
-                    : "assets/img/coffe_cupe_1.png",
-                width: 30,
-                height: 30,
+              return Column(
+                children: [
+                  Image.asset(
+                    isActive
+                        ? "assets/img/coffe_cupe.png"
+                        : "assets/img/coffe_cupe_1.png",
+                    width: 30,
+                    height: 30,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${index + 1}',
+                    style: GoogleFonts.poppins(
+                      fontSize: 10,
+                      color: isActive
+                          ? const Color(0xFF324A59)
+                          : const Color(0xFFD8D8D8),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
               );
             }),
           ),
@@ -246,7 +293,7 @@ class _LoyaltyScreenState extends State<LoyaltyScreen> {
                     ],
                   ),
                   Text(
-                    '+${item['point_value'] ?? 10} Pts',
+                    '+${item['point_value'] ?? 0} Pts',
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                       color: const Color(0xFF324A59),

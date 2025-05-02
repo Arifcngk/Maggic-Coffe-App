@@ -75,8 +75,13 @@ class ApiService {
         headers: await _getHeaders(),
       );
 
+      print('Coffee history response status: ${response.statusCode}');
+      print('Coffee history response body: ${response.body}');
+
       if (response.statusCode == 200) {
-        return json.decode(response.body);
+        final data = json.decode(response.body);
+        print('Parsed coffee history data: $data');
+        return data;
       } else {
         throw Exception(
             'Failed to load coffee history: ${response.statusCode}');

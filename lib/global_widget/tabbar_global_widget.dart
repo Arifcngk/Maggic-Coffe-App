@@ -30,7 +30,7 @@ class _BottomBarWidgetState extends State<BottomBarWidget> {
       backgroundColor: _pages[_selectedIndex] is MenuViewScreen
           ? const Color(0xFF324A59)
           : Colors.white,
-      body: _pages[_selectedIndex],
+      body: SafeArea(child: _pages[_selectedIndex]),
       bottomNavigationBar: Container(
         decoration: BoxDecoration(
           boxShadow: [

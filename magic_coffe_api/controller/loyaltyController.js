@@ -45,8 +45,14 @@ exports.getCoffeeHistory = async (req, res) => {
   const userId = req.user.id;
 
   try {
+    // Önce coffees tablosundaki point_value değerlerini kontrol et
+    const [coffeePoints] = await pool.query(
+      "SELECT coffee_id, coffee_name, point_value FROM coffees"
+    );
+    console.log("Coffee points:", coffeePoints);
+
     const [history] = await pool.query(
-      `SELECT c.coffee_name, c.image_url, c.price, 
+      `SELECT c.coffee_name, c.image_url, c.price, c.point_value,
               bo.quantity, bo.selected_volume_ml, bo.delivery_type, 
               bo.intensity, o.order_date
        FROM orders o
@@ -57,6 +63,10 @@ exports.getCoffeeHistory = async (req, res) => {
        LIMIT 10`,
       [userId]
     );
+
+    // Debug için veriyi kontrol et
+    console.log("History data:", history);
+    console.log("First item point_value:", history[0]?.point_value);
 
     res.status(200).json(history);
   } catch (error) {
