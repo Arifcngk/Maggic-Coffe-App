@@ -99,7 +99,7 @@ class _CoffeeListWidgetState extends State<CoffeeListWidget> {
                                   children: [
                                     coffee.imageUrl.isNotEmpty
                                         ? Image.network(
-                                            coffee.imageUrl,
+                                            'http://10.0.2.2:8000/coffee-images/${coffee.imageUrl}',
                                             width: 120,
                                             height: 90,
                                             errorBuilder:

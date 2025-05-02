@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kahve Yönetimi</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css"
+    />
+    <style>
+      .coffee-card {
+        transition: transform 0.2s;
+      }
+      .coffee-card:hover {
+        transform: translateY(-5px);
+      }
+      .coffee-image {
+        height: 200px;
+        object-fit: cover;
+      }
+    </style>
+  </head>
+  <body class="bg-light">
+    <div class="container py-5">
+      <div class="row mb-4">
+        <div class="col">
+          <h1 class="text-center">Kahve Yönetimi</h1>
+        </div>
+      </div>
+
+      <!-- Kahve Ekleme Formu -->
+      <div class="row mb-5">
+        <div class="col-md-6 mx-auto">
+          <div class="card shadow">
+            <div class="card-body">
+              <h5 class="card-title">Yeni Kahve Ekle</h5>
+              <form
+                action="/admin/coffees"
+                method="POST"
+                enctype="multipart/form-data"
+              >
+                <div class="mb-3">
+                  <label for="coffeeName" class="form-label">Kahve Adı</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="coffeeName"
+                    name="coffee_name"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="coffeeImage" class="form-label"
+                    >Kahve Resmi</label
+                  >
+                  <input
+                    type="file"
+                    class="form-control"
+                    id="coffeeImage"
+                    name="image"
+                    accept="image/*"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="volume" class="form-label">Hacim (ml)</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="volume"
+                    name="volume_ml"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="price" class="form-label">Fiyat</label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    class="form-control"
+                    id="price"
+                    name="price"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <label for="pointValue" class="form-label">Puan Değeri</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="pointValue"
+                    name="point_value"
+                    required
+                  />
+                </div>
+                <div class="mb-3">
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      id="isHot"
+                      name="is_hot"
+                      value="1"
+                    />
+                    <label class="form-check-label" for="isHot">
+                      Sıcak Kahve
+                    </label>
+                  </div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">
+                  Kahve Ekle
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Kahve Listesi -->
+      <div class="row">
+        <div class="col">
+          <h2 class="mb-4">Mevcut Kahveler</h2>
+          <div class="row row-cols-1 row-cols-md-3 g-4">
+            <% coffees.forEach(function(coffee) { %>
+            <div class="col">
+              <div class="card coffee-card h-100">
+                <img
+                  src="/coffee-images/<%= coffee.image_url %>"
+                  class="card-img-top coffee-image"
+                  alt="<%= coffee.coffee_name %>"
+                />
+                <div class="card-body">
+                  <h5 class="card-title"><%= coffee.coffee_name %></h5>
+                  <p class="card-text">
+                    <i class="bi bi-cup-hot"></i> <%= coffee.volume_ml %>ml
+                    <br />
+                    <i class="bi bi-currency-dollar"></i> <%= coffee.price %> TL
+                    <br />
+                    <i class="bi bi-star"></i> <%= coffee.point_value %> Puan
+                    <br />
+                    <i class="bi bi-thermometer-high"></i> <%= coffee.is_hot ?
+                    'Sıcak' : 'Soğuk' %>
+                  </p>
+                </div>
+                <div class="card-footer">
+                  <button
+                    class="btn btn-danger btn-sm"
+                    onclick="deleteCoffee(<%= coffee.coffee_id %>)"
+                  >
+                    <i class="bi bi-trash"></i> Sil
+                  </button>
+                </div>
+              </div>
+            </div>
+            <% }); %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      function deleteCoffee(coffeeId) {
+        if (confirm("Bu kahveyi silmek istediğinizden emin misiniz?")) {
+          fetch(`/admin/coffees/${coffeeId}`, {
+            method: "DELETE",
+          }).then((response) => {
+            if (response.ok) {
+              location.reload();
+            } else {
+              alert("Kahve silinirken bir hata oluştu");
+            }
+          });
+        }
+      }
+    </script>
+  </body>
+</html>

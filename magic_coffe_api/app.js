@@ -3,7 +3,7 @@ const cors = require("cors");
 const app = express();
 
 // Import routes
-const adminRoutes = require("./routes/adminRoutes");
+const adminRoutes = require("./routes/admin");
 const ordersRoutes = require("./routes/ordersRoutes");
 const productsRoutes = require("./routes/productsRoutes");
 const branchesRoutes = require("./routes/branchesRoutes");
@@ -19,6 +19,12 @@ app.use("/api", ordersRoutes);
 app.use("/api", productsRoutes);
 app.use("/api", branchesRoutes);
 app.use("/api", baristasRoutes);
+
+// Statik dosyaları servis et
+app.use(express.static("public"));
+
+// Admin route'larını ekle
+app.use("/admin", adminRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
