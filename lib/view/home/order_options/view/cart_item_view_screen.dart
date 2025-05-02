@@ -24,7 +24,6 @@ class _CartItemViewScreenState extends State<CartItemViewScreen> {
   @override
   void initState() {
     super.initState();
-    print('CartScreen: initState çağrıldı');
     _fetchCart();
     _getSelectedBranch();
   }
@@ -45,14 +44,12 @@ class _CartItemViewScreenState extends State<CartItemViewScreen> {
   }
 
   Future<void> _fetchCart() async {
-    print('CartScreen: _fetchCart çağrıldı');
     setState(() {
       _isLoading = true;
     });
 
     try {
       _cartItems = await _cartService.getCart();
-      print('CartScreen: Sepet yüklendi: $_cartItems');
     } catch (e) {
       print('CartScreen: Sepet yüklenirken hata: $e');
     } finally {
@@ -81,8 +78,8 @@ class _CartItemViewScreenState extends State<CartItemViewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print('CartScreen: build çağrıldı, _cartItems: $_cartItems');
     return Scaffold(
+      backgroundColor: const Color(0xFFF7F8FB),
       appBar: AppbarGlobalWidget(txt: 'Sepetim'),
       body: _isLoading || _isBranchLoading
           ? const Center(child: CircularProgressIndicator())
@@ -91,11 +88,27 @@ class _CartItemViewScreenState extends State<CartItemViewScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.shopping_cart_outlined, size: 64),
+                      Icon(
+                        Icons.shopping_cart_outlined,
+                        size: 80,
+                        color: Colors.grey[400],
+                      ),
                       const SizedBox(height: 16),
                       Text(
                         'Sepetiniz boş',
-                        style: GoogleFonts.poppins(fontSize: 18),
+                        style: GoogleFonts.poppins(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Kahve eklemek için menüye göz atın',
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          color: Colors.grey[500],
+                        ),
                       ),
                     ],
                   ),
@@ -104,69 +117,206 @@ class _CartItemViewScreenState extends State<CartItemViewScreen> {
                   children: [
                     Expanded(
                       child: ListView.builder(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
                         itemCount: _cartItems.length,
                         itemBuilder: (context, index) {
                           final item = _cartItems[index];
-                          return Card(
+                          return Container(
                             margin: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 8),
-                            child: ListTile(
-                              leading: Image.network(
-                                item.coffee.imageUrl,
-                                width: 50,
-                                height: 50,
-                                fit: BoxFit.cover,
-                              ),
-                              title: Text(item.coffee.coffeeName),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('${item.volumeMl}ml'),
-                                  Text(
-                                      '${item.isTakeaway ? 'Paket' : 'Mekan'} - ${item.intensity}'),
-                                ],
-                              ),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.remove),
-                                    onPressed: () => _updateQuantity(
-                                        item, item.quantity - 1),
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.05),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                        width: 100,
+                                        height: 100,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          color: Colors.grey[100],
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                          child: Image.network(
+                                            'http://10.0.2.2:8000/coffee-images/${item.coffee.imageUrl}',
+                                            fit: BoxFit.cover,
+                                            errorBuilder:
+                                                (context, error, stackTrace) {
+                                              print('Image error: $error');
+                                              return Icon(
+                                                Icons.error,
+                                                size: 40,
+                                                color: Colors.grey[400],
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 16),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              item.coffee.coffeeName,
+                                              style: GoogleFonts.poppins(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              '${item.volumeMl}ml',
+                                              style: GoogleFonts.poppins(
+                                                fontSize: 14,
+                                                color: Colors.grey[600],
+                                              ),
+                                            ),
+                                            Text(
+                                              '${item.isTakeaway ? 'Paket' : 'Mekan'} - ${item.intensity}',
+                                              style: GoogleFonts.poppins(
+                                                fontSize: 14,
+                                                color: Colors.grey[600],
+                                              ),
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Container(
+                                                  decoration: BoxDecoration(
+                                                    color:
+                                                        const Color(0xFFF7F8FB),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            20),
+                                                  ),
+                                                  child: Row(
+                                                    children: [
+                                                      IconButton(
+                                                        icon: const Icon(
+                                                            Icons.remove,
+                                                            size: 20),
+                                                        onPressed: () =>
+                                                            _updateQuantity(
+                                                                item,
+                                                                item.quantity -
+                                                                    1),
+                                                        padding:
+                                                            EdgeInsets.zero,
+                                                        constraints:
+                                                            const BoxConstraints(),
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                horizontal: 8),
+                                                        child: Text(
+                                                          '${item.quantity}',
+                                                          style: GoogleFonts
+                                                              .poppins(
+                                                            fontSize: 16,
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      IconButton(
+                                                        icon: const Icon(
+                                                            Icons.add,
+                                                            size: 20),
+                                                        onPressed: () =>
+                                                            _updateQuantity(
+                                                                item,
+                                                                item.quantity +
+                                                                    1),
+                                                        padding:
+                                                            EdgeInsets.zero,
+                                                        constraints:
+                                                            const BoxConstraints(),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                IconButton(
+                                                  icon: const Icon(
+                                                      Icons.delete_outline),
+                                                  onPressed: () =>
+                                                      _removeItem(item),
+                                                  color: Colors.red[300],
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  Text('${item.quantity}'),
-                                  IconButton(
-                                    icon: const Icon(Icons.add),
-                                    onPressed: () => _updateQuantity(
-                                        item, item.quantity + 1),
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.delete),
-                                    onPressed: () => _removeItem(item),
-                                  ),
-                                ],
-                              ),
+                                ),
+                                Container(
+                                  height: 1,
+                                  color: Colors.grey[200],
+                                ),
+                              ],
                             ),
                           );
                         },
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, -2),
+                          ),
+                        ],
+                      ),
                       child: Column(
                         children: [
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Toplam',
+                                'Toplam Tutar',
                                 style: GoogleFonts.poppins(
-                                    fontSize: 18, fontWeight: FontWeight.bold),
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                               Text(
                                 '${_cartService.getTotalPrice(_cartItems).toStringAsFixed(2)} TL',
                                 style: GoogleFonts.poppins(
-                                    fontSize: 18, fontWeight: FontWeight.bold),
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600,
+                                  color: const Color(0xFF001833),
+                                ),
                               ),
                             ],
                           ),
@@ -189,14 +339,20 @@ class _CartItemViewScreenState extends State<CartItemViewScreen> {
                                   },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF001833),
-                              minimumSize: const Size(double.infinity, 50),
+                              minimumSize: const Size(double.infinity, 56),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                             ),
                             child: Text(
                               _selectedBranchId == null
                                   ? 'Şube bilgisi yükleniyor...'
                                   : 'Ödemeye Geç',
                               style: GoogleFonts.poppins(
-                                  fontSize: 16, color: Colors.white),
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ],

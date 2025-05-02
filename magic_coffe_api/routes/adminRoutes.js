@@ -1,11 +1,18 @@
 const express = require("express");
 const router = express.Router();
 const adminController = require("../controller/adminController");
+const coffeeController = require("../controller/coffeeController");
+const upload = require("../middleware/uploadMiddleware");
 
 // Coffee routes
-router.get("/coffees", adminController.getAllCoffees);
-router.post("/coffees", adminController.addCoffee);
-router.delete("/coffees/:id", adminController.deleteCoffee);
+router.get("/coffees", coffeeController.getCoffeeManagementPage);
+router.post("/coffees", upload.single("image"), coffeeController.addCoffee);
+router.delete("/coffees/:id", coffeeController.deleteCoffee);
+router.put(
+  "/coffees/:id",
+  upload.single("image"),
+  coffeeController.updateCoffee
+);
 
 // Branch routes
 router.get("/branches", adminController.getAllBranches);

@@ -26,98 +26,207 @@ class _CoffeeListWidgetState extends State<CoffeeListWidget> {
   @override
   Widget build(BuildContext context) {
     final coffeeProvider = Provider.of<CoffeeProvider>(context);
+    final size = MediaQuery.of(context).size;
 
     print('Coffee count: ${coffeeProvider.coffees.length}');
     print('Is loading: ${coffeeProvider.isLoading}');
     print('Error: ${coffeeProvider.error}');
 
     return Positioned.fill(
-      top: MediaQuery.of(context).size.height * 0.1,
+      top: size.height * 0.1,
       child: Container(
-        decoration: const BoxDecoration(
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(25),
-            topRight: Radius.circular(25),
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(30),
+            topRight: Radius.circular(30),
           ),
-          color: Color(0xFF324A59),
+          color: const Color(0xFF324A59),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 10,
+              offset: const Offset(0, -5),
+            ),
+          ],
         ),
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 25),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 10),
-            Text(
-              "Select your Coffee",
-              textAlign: TextAlign.left,
-              style: GoogleFonts.poppins(
-                fontSize: 20,
-                fontWeight: FontWeight.w500,
-                color: const Color(0xFFD8D8D8),
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Select your Coffee",
+                  style: GoogleFonts.poppins(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.filter_list,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 25),
             Expanded(
               child: coffeeProvider.isLoading
-                  ? const Center(child: CircularProgressIndicator())
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
                   : coffeeProvider.coffees.isEmpty
-                      ? const Center(
-                          child: Text(
-                            'Kahve bulunamadı',
-                            style: TextStyle(color: Colors.white, fontSize: 16),
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.coffee_outlined,
+                                size: 64,
+                                color: Colors.white.withOpacity(0.5),
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                'Kahve bulunamadı',
+                                style: GoogleFonts.poppins(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
                           ),
                         )
                       : GridView.builder(
-                          padding: const EdgeInsets.symmetric(horizontal: 5),
+                          padding: EdgeInsets.zero,
                           gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
+                              SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
-                            crossAxisSpacing: 10,
-                            mainAxisSpacing: 6,
-                            childAspectRatio: 0.96,
+                            crossAxisSpacing: 15,
+                            mainAxisSpacing: 15,
+                            childAspectRatio: 0.85,
                           ),
                           itemCount: coffeeProvider.coffees.length,
                           itemBuilder: (context, index) {
                             final coffee = coffeeProvider.coffees[index];
-                            return InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        OrderOptionsViewScreen(coffee: coffee),
-                                  ),
+                            return TweenAnimationBuilder(
+                              tween: Tween<double>(begin: 0, end: 1),
+                              duration:
+                                  Duration(milliseconds: 300 + (index * 100)),
+                              builder: (context, value, child) {
+                                return Transform.scale(
+                                  scale: value,
+                                  child: child,
                                 );
                               },
-                              child: Card(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                elevation: 4,
-                                color: Colors.white,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    coffee.imageUrl.isNotEmpty
-                                        ? Image.network(
-                                            'http://10.0.2.2:8000/coffee-images/${coffee.imageUrl}',
-                                            width: 120,
-                                            height: 90,
-                                            errorBuilder:
-                                                (context, error, stackTrace) =>
-                                                    const Icon(Icons.error),
-                                          )
-                                        : const Icon(Icons.image_not_supported,
-                                            size: 90),
-                                    const SizedBox(height: 10),
-                                    Text(
-                                      coffee.coffeeName,
-                                      style: GoogleFonts.dmSans(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.black,
-                                      ),
+                              child: InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          OrderOptionsViewScreen(
+                                              coffee: coffee),
                                     ),
-                                  ],
+                                  );
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(20),
+                                    color: Colors.white,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        blurRadius: 10,
+                                        offset: const Offset(0, 5),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        width: 120,
+                                        height: 100,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                          color: Colors.grey[100],
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                          child: coffee.imageUrl.isNotEmpty
+                                              ? Image.network(
+                                                  'http://10.0.2.2:8000/coffee-images/${coffee.imageUrl}',
+                                                  fit: BoxFit.cover,
+                                                  errorBuilder: (context, error,
+                                                          stackTrace) =>
+                                                      Icon(
+                                                    Icons.error,
+                                                    color: Colors.grey[400],
+                                                    size: 40,
+                                                  ),
+                                                )
+                                              : Icon(
+                                                  Icons.image_not_supported,
+                                                  size: 40,
+                                                  color: Colors.grey[400],
+                                                ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 12),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8),
+                                        child: Text(
+                                          coffee.coffeeName,
+                                          style: GoogleFonts.dmSans(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                            color: const Color(0xFF324A59),
+                                          ),
+                                          textAlign: TextAlign.center,
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF324A59)
+                                              .withOpacity(0.1),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
+                                        ),
+                                        child: Text(
+                                          '${coffee.price} TL',
+                                          style: GoogleFonts.dmSans(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                            color: const Color(0xFF324A59),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             );

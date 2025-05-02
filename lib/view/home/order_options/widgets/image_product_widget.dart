@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 class ImageWidget extends StatelessWidget {
-  final String imageUrl; // Eklendi
+  final String imageUrl;
 
   const ImageWidget({
     super.key,
-    required this.imageUrl, // Eklendi
+    required this.imageUrl,
   });
 
   @override
@@ -19,10 +19,12 @@ class ImageWidget extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         child: Image.network(
-          imageUrl, // Güncellendi
+          'http://10.0.2.2:8000/coffee-images/$imageUrl',
           fit: BoxFit.contain,
-          errorBuilder: (context, error, stackTrace) =>
-              const Icon(Icons.error), // Hata durumunda ikon
+          errorBuilder: (context, error, stackTrace) {
+            print('Image error: $error');
+            return const Icon(Icons.error, size: 50, color: Colors.grey);
+          },
         ),
       ),
     );

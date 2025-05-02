@@ -88,34 +88,119 @@ exports.addCoffee = async (req, res) => {
 
 exports.deleteCoffee = async (req, res) => {
   const coffeeId = req.params.id;
+  const connection = await pool.getConnection();
 
   try {
-    // Önce kahvenin resmini bul
-    const [coffee] = await pool.query(
+    await connection.beginTransaction();
+
+    // Önce kahvenin resim URL'sini al
+    const [coffee] = await connection.query(
       "SELECT image_url FROM coffees WHERE coffee_id = ?",
       [coffeeId]
     );
 
-    if (coffee.length === 0) {
+    if (!coffee) {
+      await connection.rollback();
       return res.status(404).json({ message: "Kahve bulunamadı" });
     }
 
-    // Kahveyi sil
-    await pool.query("DELETE FROM coffees WHERE coffee_id = ?", [coffeeId]);
+    // Kahveyi veritabanından sil
+    await connection.query("DELETE FROM coffees WHERE coffee_id = ?", [
+      coffeeId,
+    ]);
 
-    // Resmi sil
-    const imagePath = path.join(
-      __dirname,
-      "../public/coffee-images",
-      coffee[0].image_url
-    );
-    if (fs.existsSync(imagePath)) {
-      fs.unlinkSync(imagePath);
+    // Eğer resim varsa, sunucudan da sil
+    if (coffee.image_url) {
+      const imagePath = path.join(
+        __dirname,
+        "..",
+        "public",
+        "coffee-images",
+        coffee.image_url
+      );
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
     }
 
-    res.status(200).json({ message: "Kahve başarıyla silindi" });
+    await connection.commit();
+    res.json({ message: "Kahve başarıyla silindi" });
   } catch (error) {
-    console.error("Kahve silinirken hata:", error);
-    res.status(500).json({ message: "Kahve silinemedi" });
+    await connection.rollback();
+    console.error("Kahve silme hatası:", error);
+    res.status(500).json({ message: "Kahve silinirken bir hata oluştu" });
+  } finally {
+    connection.release();
+  }
+};
+
+exports.updateCoffee = async (req, res) => {
+  const coffeeId = req.params.id;
+  const { coffee_name, volume_ml, price, point_value, is_hot } = req.body;
+  const connection = await pool.getConnection();
+
+  try {
+    await connection.beginTransaction();
+
+    // Önce kahvenin mevcut bilgilerini al
+    const [coffee] = await connection.query(
+      "SELECT * FROM coffees WHERE coffee_id = ?",
+      [coffeeId]
+    );
+
+    if (!coffee) {
+      await connection.rollback();
+      return res.status(404).json({ message: "Kahve bulunamadı" });
+    }
+
+    let imageUrl = coffee[0].image_url;
+
+    // Eğer yeni resim yüklendiyse
+    if (req.file) {
+      // Eski resmi sil
+      if (imageUrl) {
+        const oldImagePath = path.join(
+          __dirname,
+          "..",
+          "public",
+          "coffee-images",
+          imageUrl
+        );
+        if (fs.existsSync(oldImagePath)) {
+          fs.unlinkSync(oldImagePath);
+        }
+      }
+
+      // Yeni resmi kaydet
+      const image = req.file;
+      const imageName = `${Date.now()}-${image.originalname}`;
+      const imagePath = path.join(
+        __dirname,
+        "..",
+        "public",
+        "coffee-images",
+        imageName
+      );
+
+      fs.writeFileSync(imagePath, image.buffer);
+      imageUrl = imageName;
+    }
+
+    // Kahveyi güncelle
+    await connection.query(
+      `UPDATE coffees 
+       SET coffee_name = ?, volume_ml = ?, price = ?, point_value = ?, is_hot = ?, image_url = ?
+       WHERE coffee_id = ?`,
+      [coffee_name, volume_ml, price, point_value, is_hot, imageUrl, coffeeId]
+    );
+
+    await connection.commit();
+    res.json({ message: "Kahve başarıyla güncellendi" });
+  } catch (error) {
+    await connection.rollback();
+    console.error("Kahve güncelleme hatası:", error);
+    res.status(500).json({ message: "Kahve güncellenirken bir hata oluştu" });
+  } finally {
+    connection.release();
   }
 };
