@@ -190,6 +190,47 @@ class ApiService {
     return json.decode(response.body);
   }
 
+  static Future<Map<String, dynamic>> addBranch({
+    required String name,
+    required String location,
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/branches'),
+      headers: await _getHeaders(),
+      body: json.encode({
+        'branch_name': name,
+        'location': location,
+      }),
+    );
+    return json.decode(response.body);
+  }
+
+  // Barista API'leri
+  static Future<List<dynamic>> getBaristas() async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/baristas'),
+      headers: await _getHeaders(),
+    );
+    return json.decode(response.body);
+  }
+
+  static Future<Map<String, dynamic>> addBarista({
+    required String name,
+    required String email,
+    required int branchId,
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/baristas'),
+      headers: await _getHeaders(),
+      body: json.encode({
+        'barista_name': name,
+        'email': email,
+        'branch_id': branchId,
+      }),
+    );
+    return json.decode(response.body);
+  }
+
   // Kredi Kartı API'leri
   static Future<List<dynamic>> getCreditCards() async {
     final response = await http.get(

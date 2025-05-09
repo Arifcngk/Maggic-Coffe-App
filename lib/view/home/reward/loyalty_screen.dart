@@ -213,141 +213,207 @@ class _LoyaltyScreenState extends State<LoyaltyScreen> {
       showDialog(
         context: context,
         builder: (context) => StatefulBuilder(
-          builder: (context, setState) => AlertDialog(
-            title: Text(
-              'Ücretsiz Kahve Seç',
-              style: GoogleFonts.poppins(
-                color: const Color(0xFF324A59),
-                fontWeight: FontWeight.w600,
-              ),
+          builder: (context, setState) => Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
             ),
-            content: SizedBox(
-              width: double.maxFinite,
+            child: Container(
+              padding: const EdgeInsets.all(24),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Şube Seçimi
-                  DropdownButtonFormField<int>(
-                    decoration: InputDecoration(
-                      labelText: 'Şube Seçin',
-                      labelStyle: GoogleFonts.poppins(
-                        color: const Color(0xFF324A59),
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(
-                          color: Color(0xFF324A59),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Ücretsiz Kahve Seç',
+                        style: GoogleFonts.poppins(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF324A59),
                         ),
                       ),
-                    ),
-                    value: selectedBranchId,
-                    items: branches.map((branch) {
-                      return DropdownMenuItem<int>(
-                        value: branch['branch_id'],
-                        child: Text(
-                          branch['branch_name'],
-                          style: GoogleFonts.poppins(
-                            color: const Color(0xFF324A59),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        selectedBranchId = value;
-                      });
-                    },
+                      IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(Icons.close),
+                        color: Colors.grey[600],
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 16),
-                  // Kahve Seçimi
-                  DropdownButtonFormField<int>(
-                    decoration: InputDecoration(
-                      labelText: 'Kahve Seçin',
-                      labelStyle: GoogleFonts.poppins(
-                        color: const Color(0xFF324A59),
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: const BorderSide(
-                          color: Color(0xFF324A59),
-                        ),
-                      ),
+                  const SizedBox(height: 24),
+                  Text(
+                    'Şube Seçin',
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF324A59),
                     ),
-                    value: selectedCoffeeId,
-                    items: coffees.map((coffee) {
-                      return DropdownMenuItem<int>(
-                        value: coffee['coffee_id'],
-                        child: Text(
-                          coffee['coffee_name'],
-                          style: GoogleFonts.poppins(
-                            color: const Color(0xFF324A59),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: const Color(0xFF324A59).withOpacity(0.2),
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: DropdownButtonFormField<int>(
+                      decoration: const InputDecoration(
+                        contentPadding: EdgeInsets.symmetric(horizontal: 16),
+                        border: InputBorder.none,
+                      ),
+                      value: selectedBranchId,
+                      items: branches.map((branch) {
+                        return DropdownMenuItem<int>(
+                          value: branch['branch_id'],
+                          child: Text(
+                            branch['branch_name'],
+                            style: GoogleFonts.poppins(
+                              color: const Color(0xFF324A59),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedBranchId = value;
+                        });
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  Text(
+                    'Kahve Seçin',
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: const Color(0xFF324A59),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: const Color(0xFF324A59).withOpacity(0.2),
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: DropdownButtonFormField<int>(
+                      decoration: const InputDecoration(
+                        contentPadding: EdgeInsets.symmetric(horizontal: 16),
+                        border: InputBorder.none,
+                      ),
+                      value: selectedCoffeeId,
+                      items: coffees.map((coffee) {
+                        return DropdownMenuItem<int>(
+                          value: coffee['coffee_id'],
+                          child: Text(
+                            coffee['coffee_name'],
+                            style: GoogleFonts.poppins(
+                              color: const Color(0xFF324A59),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedCoffeeId = value;
+                        });
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
                           ),
                         ),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        selectedCoffeeId = value;
-                      });
-                    },
+                        child: Text(
+                          'İptal',
+                          style: GoogleFonts.poppins(
+                            color: Colors.grey[600],
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: selectedBranchId != null &&
+                                selectedCoffeeId != null
+                            ? () async {
+                                try {
+                                  await ApiService.redeemFreeCoffee(
+                                    selectedCoffeeId!,
+                                    selectedBranchId!,
+                                  );
+                                  if (!mounted) return;
+                                  Navigator.pop(context);
+                                  _loadData();
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Ücretsiz kahveniz başarıyla kullanıldı!',
+                                        style: GoogleFonts.poppins(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      backgroundColor: Colors.green,
+                                      behavior: SnackBarBehavior.floating,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                  );
+                                } catch (e) {
+                                  if (!mounted) return;
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Hata: $e',
+                                        style: GoogleFonts.poppins(
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      backgroundColor: Colors.red,
+                                      behavior: SnackBarBehavior.floating,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                  );
+                                }
+                              }
+                            : null,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF324A59),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: Text(
+                          'Onayla',
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: Text(
-                  'İptal',
-                  style: GoogleFonts.poppins(
-                    color: const Color(0xFF324A59),
-                  ),
-                ),
-              ),
-              ElevatedButton(
-                onPressed: selectedBranchId != null && selectedCoffeeId != null
-                    ? () async {
-                        try {
-                          await ApiService.redeemFreeCoffee(
-                            selectedCoffeeId!,
-                            selectedBranchId!,
-                          );
-                          if (!mounted) return;
-                          Navigator.pop(context);
-                          _loadData(); // Puanları yenile
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                  'Ücretsiz kahveniz başarıyla kullanıldı!'),
-                              backgroundColor: Colors.green,
-                            ),
-                          );
-                        } catch (e) {
-                          if (!mounted) return;
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Hata: $e'),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                        }
-                      }
-                    : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF324A59),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(25),
-                  ),
-                ),
-                child: Text(
-                  'Onayla',
-                  style: GoogleFonts.poppins(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
           ),
         ),
       );
@@ -355,7 +421,7 @@ class _LoyaltyScreenState extends State<LoyaltyScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Veriler yüklenirken hata oluştu: $e'),
+          content: Text('Hata: $e'),
           backgroundColor: Colors.red,
         ),
       );
