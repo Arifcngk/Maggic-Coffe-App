@@ -93,15 +93,87 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       if (!mounted) return;
 
       if (response['message'] == 'Sipariş oluşturuldu') {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => OrderConfirmationScreen(
-              orderId: response['order_id'],
-              baristaName: response['barista_name'],
-              baristaEmail: response['barista_email'],
-            ),
-          ),
+        await showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext context) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        color: Colors.green[50],
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        Icons.check_circle_outline,
+                        size: 50,
+                        color: Colors.green[700],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      'Siparişiniz Alındı!',
+                      style: GoogleFonts.poppins(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF001833),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      'Siparişiniz hazırlanmaya başlandı',
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        color: Colors.grey[600],
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 30),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => OrderConfirmationScreen(
+                              orderId: response['order_id'],
+                              baristaName: response['barista_name'],
+                              baristaEmail: response['barista_email'],
+                            ),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF001833),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        minimumSize: const Size(200, 52),
+                        elevation: 2,
+                      ),
+                      child: Text(
+                        'Devam Et',
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
         );
       } else {
         throw Exception(response['message'] ?? 'Sipariş oluşturulamadı');

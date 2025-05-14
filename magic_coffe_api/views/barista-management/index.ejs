@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Barista Yönetimi</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css"
+    />
+    <style>
+      body {
+        background-color: #f8f9fa;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+      .navbar {
+        background-color: #6f4e37;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .navbar-brand {
+        color: white !important;
+        font-weight: bold;
+      }
+      .card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+      }
+      .card:hover {
+        transform: translateY(-5px);
+      }
+      .section-title {
+        color: #6f4e37;
+        font-weight: bold;
+        margin-bottom: 2rem;
+        position: relative;
+        padding-bottom: 10px;
+      }
+      .section-title:after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 50px;
+        height: 3px;
+        background-color: #6f4e37;
+      }
+      .barista-card {
+        position: relative;
+      }
+      .barista-image {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 50%;
+        margin-bottom: 1rem;
+      }
+      .action-buttons {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+      <div class="container">
+        <a class="navbar-brand" href="#">
+          <i class="bi bi-people-fill me-2"></i>
+          Barista Yönetimi
+        </a>
+        <div class="d-flex">
+          <a href="/coffee-management" class="btn btn-outline-light me-2">
+            <i class="bi bi-cup-hot me-2"></i>Kahve Yönetimi
+          </a>
+          <button class="btn btn-outline-light" onclick="showAddBaristaModal()">
+            <i class="bi bi-plus-circle me-2"></i>Yeni Barista Ekle
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+      <h2 class="section-title">Baristalar</h2>
+      <div class="row" id="baristasContainer">
+        <!-- Baristalar buraya dinamik olarak eklenecek -->
+      </div>
+    </div>
+
+    <!-- Barista Ekleme/Düzenleme Modal -->
+    <div class="modal fade" id="baristaModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalTitle">Yeni Barista Ekle</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form id="baristaForm">
+              <input type="hidden" id="baristaId" />
+              <div class="mb-3">
+                <label for="firstName" class="form-label">Ad</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="firstName"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="lastName" class="form-label">Soyad</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="lastName"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="email" class="form-label">E-posta</label>
+                <input type="email" class="form-control" id="email" required />
+              </div>
+              <div class="mb-3">
+                <label for="password" class="form-label">Şifre</label>
+                <input type="password" class="form-control" id="password" />
+                <small class="text-muted"
+                  >Düzenleme sırasında boş bırakılırsa şifre değişmez</small
+                >
+              </div>
+              <div class="mb-3">
+                <label for="specialty" class="form-label">Uzmanlık</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="specialty"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="branchId" class="form-label">Şube</label>
+                <select class="form-control" id="branchId" required>
+                  <!-- Şubeler dinamik olarak eklenecek -->
+                </select>
+              </div>
+              <div class="mb-3">
+                <label for="imageUrl" class="form-label"
+                  >Profil Resmi URL</label
+                >
+                <input type="url" class="form-control" id="imageUrl" />
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              İptal
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              onclick="saveBarista()"
+            >
+              Kaydet
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      let baristaModal;
+
+      document.addEventListener("DOMContentLoaded", () => {
+        baristaModal = new bootstrap.Modal(
+          document.getElementById("baristaModal")
+        );
+        loadBaristas();
+        loadBranches();
+      });
+
+      // Baristaları yükle
+      async function loadBaristas() {
+        try {
+          const response = await fetch("/api/baristas");
+          const baristas = await response.json();
+          displayBaristas(baristas);
+        } catch (error) {
+          console.error("Barista yükleme hatası:", error);
+          alert("Baristalar yüklenirken bir hata oluştu");
+        }
+      }
+
+      // Şubeleri yükle
+      async function loadBranches() {
+        try {
+          const response = await fetch("/api/branches");
+          const branches = await response.json();
+          const select = document.getElementById("branchId");
+          select.innerHTML = branches
+            .map(
+              (branch) =>
+                `<option value="${branch.branch_id}">${branch.branch_name}</option>`
+            )
+            .join("");
+        } catch (error) {
+          console.error("Şube yükleme hatası:", error);
+          alert("Şubeler yüklenirken bir hata oluştu");
+        }
+      }
+
+      // Baristaları görüntüle
+      function displayBaristas(baristas) {
+        const container = document.getElementById("baristasContainer");
+        container.innerHTML = baristas
+          .map(
+            (barista) => `
+                <div class="col-md-4 mb-4">
+                    <div class="card barista-card">
+                        <div class="card-body text-center">
+                            <img src="${
+                              barista.image_url || "/images/default-barista.png"
+                            }" 
+                                 class="barista-image" 
+                                 alt="${barista.first_name} ${
+              barista.last_name
+            }">
+                            <h5 class="card-title">${barista.first_name} ${
+              barista.last_name
+            }</h5>
+                            <p class="card-text">
+                                <i class="bi bi-envelope me-2"></i>${
+                                  barista.email
+                                }<br>
+                                <i class="bi bi-star me-2"></i>${
+                                  barista.specialty
+                                }<br>
+                                <i class="bi bi-shop me-2"></i>${
+                                  barista.branch_name
+                                }
+                            </p>
+                            <div class="action-buttons">
+                                <button class="btn btn-sm btn-outline-primary me-2" 
+                                        onclick="editBarista(${JSON.stringify(
+                                          barista
+                                        ).replace(/"/g, "&quot;")})">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" 
+                                        onclick="deleteBarista(${
+                                          barista.barista_id
+                                        })">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `
+          )
+          .join("");
+      }
+
+      // Yeni barista modalını göster
+      function showAddBaristaModal() {
+        document.getElementById("modalTitle").textContent = "Yeni Barista Ekle";
+        document.getElementById("baristaForm").reset();
+        document.getElementById("baristaId").value = "";
+        document.getElementById("password").required = true;
+        baristaModal.show();
+      }
+
+      // Barista düzenleme modalını göster
+      function editBarista(barista) {
+        document.getElementById("modalTitle").textContent = "Barista Düzenle";
+        document.getElementById("baristaId").value = barista.barista_id;
+        document.getElementById("firstName").value = barista.first_name;
+        document.getElementById("lastName").value = barista.last_name;
+        document.getElementById("email").value = barista.email;
+        document.getElementById("password").value = "";
+        document.getElementById("password").required = false;
+        document.getElementById("specialty").value = barista.specialty;
+        document.getElementById("branchId").value = barista.branch_id;
+        document.getElementById("imageUrl").value = barista.image_url || "";
+        baristaModal.show();
+      }
+
+      // Barista kaydet
+      async function saveBarista() {
+        const formData = {
+          barista_id: document.getElementById("baristaId").value,
+          first_name: document.getElementById("firstName").value,
+          last_name: document.getElementById("lastName").value,
+          email: document.getElementById("email").value,
+          specialty: document.getElementById("specialty").value,
+          branch_id: document.getElementById("branchId").value,
+          image_url: document.getElementById("imageUrl").value,
+        };
+
+        const password = document.getElementById("password").value;
+        if (password) {
+          formData.password = password;
+        }
+
+        try {
+          const url = formData.barista_id
+            ? `/api/baristas/${formData.barista_id}`
+            : "/api/baristas";
+
+          const response = await fetch(url, {
+            method: formData.barista_id ? "PUT" : "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formData),
+          });
+
+          if (response.ok) {
+            baristaModal.hide();
+            loadBaristas();
+          } else {
+            const data = await response.json();
+            alert(data.message || "Barista kaydedilirken bir hata oluştu");
+          }
+        } catch (error) {
+          console.error("Barista kaydetme hatası:", error);
+          alert("Barista kaydedilirken bir hata oluştu");
+        }
+      }
+
+      // Barista sil
+      async function deleteBarista(baristaId) {
+        if (!confirm("Bu baristayı silmek istediğinizden emin misiniz?")) {
+          return;
+        }
+
+        try {
+          const response = await fetch(`/api/baristas/${baristaId}`, {
+            method: "DELETE",
+          });
+
+          if (response.ok) {
+            loadBaristas();
+          } else {
+            const data = await response.json();
+            alert(data.message || "Barista silinirken bir hata oluştu");
+          }
+        } catch (error) {
+          console.error("Barista silme hatası:", error);
+          alert("Barista silinirken bir hata oluştu");
+        }
+      }
+    </script>
+  </body>
+</html>

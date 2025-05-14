@@ -1,32 +1,38 @@
 const jwt = require("jsonwebtoken");
 
-const authMiddleware = (req, res, next) => {
-  // Authorization başlığından token'ı al, "Bearer " ön ekini kaldır
-  const token = req.header("Authorization")?.replace("Bearer ", "");
-
-  if (!token) {
-    return res
-      .status(401)
-      .json({ message: "Token bulunamadı, yetkilendirme reddedildi" });
-  }
-
+module.exports = (req, res, next) => {
   try {
-    // Token'ı doğrula
+    const token = req.headers.authorization?.split(" ")[1];
+
+    if (!token) {
+      return res
+        .status(401)
+        .json({ message: "Yetkilendirme token'ı bulunamadı" });
+    }
+
     const decoded = jwt.verify(
       token,
       process.env.JWT_SECRET || "supersecretkey123"
     );
-    req.user = decoded; // decoded içinde user_id (id) olacak
+
+    // Barista veya normal kullanıcı kontrolü
+    if (decoded.barista_id) {
+      // Barista girişi
+      req.user = {
+        barista_id: decoded.barista_id,
+        branch_id: decoded.branch_id,
+        email: decoded.email,
+      };
+    } else {
+      // Normal kullanıcı girişi
+      req.user = {
+        id: decoded.id,
+      };
+    }
+
     next();
   } catch (error) {
-    console.error("Token doğrulama hatası:", error.message);
-    if (error.name === "TokenExpiredError") {
-      return res
-        .status(401)
-        .json({ message: "Token süresi dolmuş, lütfen tekrar giriş yapın" });
-    }
+    console.error("Token doğrulama hatası:", error);
     return res.status(401).json({ message: "Geçersiz token" });
   }
 };
-
-module.exports = authMiddleware;

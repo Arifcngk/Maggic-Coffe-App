@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Barista Paneli</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css"
+    />
+    <style>
+      body {
+        background-color: #f8f9fa;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+      .navbar {
+        background-color: #6f4e37;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .navbar-brand {
+        color: white !important;
+        font-weight: bold;
+      }
+      .card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+      }
+      .card:hover {
+        transform: translateY(-5px);
+      }
+      .order-card {
+        margin-bottom: 20px;
+      }
+      .order-status {
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+      .status-pending {
+        background-color: #fff3cd;
+        color: #856404;
+      }
+      .status-preparing {
+        background-color: #cce5ff;
+        color: #004085;
+      }
+      .status-ready {
+        background-color: #d4edda;
+        color: #155724;
+      }
+      .status-completed {
+        background-color: #e2e3e5;
+        color: #383d41;
+      }
+      .login-container {
+        max-width: 400px;
+        margin: 100px auto;
+      }
+      .section-title {
+        color: #6f4e37;
+        font-weight: bold;
+        margin-bottom: 2rem;
+        position: relative;
+        padding-bottom: 10px;
+      }
+      .section-title:after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 50px;
+        height: 3px;
+        background-color: #6f4e37;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Login Form -->
+    <div id="loginSection" class="login-container">
+      <div class="card">
+        <div class="card-body">
+          <h3 class="section-title text-center">Barista Girişi</h3>
+          <form id="loginForm">
+            <div class="mb-3">
+              <label for="email" class="form-label">E-posta</label>
+              <input type="email" class="form-control" id="email" required />
+            </div>
+            <div class="mb-3">
+              <label for="password" class="form-label">Şifre</label>
+              <input
+                type="password"
+                class="form-control"
+                id="password"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              class="btn btn-primary w-100"
+              style="background-color: #6f4e37; border-color: #6f4e37"
+            >
+              Giriş Yap
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboardSection" style="display: none">
+      <nav class="navbar navbar-expand-lg navbar-dark mb-4">
+        <div class="container">
+          <a class="navbar-brand" href="#">
+            <i class="bi bi-cup-hot-fill me-2"></i>
+            Barista Paneli
+          </a>
+          <div class="d-flex">
+            <span class="navbar-text me-3">
+              <i class="bi bi-person-circle me-2"></i>
+              <span id="baristaName"></span>
+            </span>
+            <button class="btn btn-outline-light btn-sm" onclick="logout()">
+              <i class="bi bi-box-arrow-right me-2"></i>Çıkış
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      <div class="container">
+        <div class="row mb-4">
+          <div class="col">
+            <h2 class="section-title">Siparişler</h2>
+            <div class="btn-group mb-3">
+              <button class="btn btn-outline-primary active" data-status="all">
+                Tümü
+              </button>
+              <button class="btn btn-outline-warning" data-status="pending">
+                Bekleyen
+              </button>
+              <button class="btn btn-outline-info" data-status="preparing">
+                Hazırlanıyor
+              </button>
+              <button class="btn btn-outline-success" data-status="ready">
+                Hazır
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="row" id="ordersContainer">
+          <!-- Siparişler buraya dinamik olarak eklenecek -->
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Login işlemi
+      document
+        .getElementById("loginForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const email = document.getElementById("email").value;
+          const password = document.getElementById("password").value;
+
+          try {
+            const response = await fetch("/api/auth/barista-login", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ email, password }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+              localStorage.setItem("baristaToken", data.token);
+              localStorage.setItem(
+                "baristaName",
+                `${data.first_name} ${data.last_name}`
+              );
+              localStorage.setItem("baristaSpecialty", data.specialty);
+              localStorage.setItem("baristaImage", data.image_url);
+              showDashboard();
+              loadOrders();
+            } else {
+              console.error("Login error response:", data);
+              alert(data.error || data.message || "Giriş başarısız");
+            }
+          } catch (error) {
+            console.error("Login error:", error);
+            alert(`Giriş yapılırken bir hata oluştu: ${error.message}`);
+          }
+        });
+
+      // Dashboard'ı göster
+      function showDashboard() {
+        document.getElementById("loginSection").style.display = "none";
+        document.getElementById("dashboardSection").style.display = "block";
+        document.getElementById("baristaName").textContent =
+          localStorage.getItem("baristaName");
+
+        // Barista bilgilerini göster
+        const baristaInfo = document.createElement("div");
+        baristaInfo.className = "navbar-text me-3";
+        baristaInfo.innerHTML = `
+          <div class="d-flex align-items-center">
+            <img src="${
+              localStorage.getItem("baristaImage") ||
+              "/images/default-barista.png"
+            }" 
+                 class="rounded-circle me-2" 
+                 style="width: 32px; height: 32px; object-fit: cover;">
+            <div>
+              <div>${localStorage.getItem("baristaName")}</div>
+              <small class="text-light">${localStorage.getItem(
+                "baristaSpecialty"
+              )}</small>
+            </div>
+          </div>
+        `;
+
+        const navbarRight = document.querySelector(".navbar .d-flex");
+        navbarRight.insertBefore(baristaInfo, navbarRight.firstChild);
+      }
+
+      // Siparişleri yükle
+      async function loadOrders(status = "all") {
+        try {
+          const response = await fetch("/api/orders/barista", {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("baristaToken")}`,
+            },
+          });
+
+          const orders = await response.json();
+          displayOrders(orders, status);
+        } catch (error) {
+          console.error("Orders loading error:", error);
+          alert("Siparişler yüklenirken bir hata oluştu");
+        }
+      }
+
+      // Siparişleri görüntüle
+      function displayOrders(orders, status) {
+        const container = document.getElementById("ordersContainer");
+        container.innerHTML = "";
+
+        const filteredOrders =
+          status === "all"
+            ? orders
+            : orders.filter((order) => order.status === status);
+
+        filteredOrders.forEach((order) => {
+          const orderCard = createOrderCard(order);
+          container.appendChild(orderCard);
+        });
+      }
+
+      // Sipariş kartı oluştur
+      function createOrderCard(order) {
+        const statusColors = {
+          pending: "bg-yellow-100 text-yellow-800",
+          completed: "bg-green-100 text-green-800",
+          cancelled: "bg-red-100 text-red-800",
+        };
+
+        const statusTexts = {
+          pending: "Beklemede",
+          completed: "Tamamlandı",
+          cancelled: "İptal Edildi",
+        };
+
+        return `
+          <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+            <div class="flex justify-between items-start mb-4">
+              <div>
+                <h3 class="text-lg font-semibold">Sipariş #${
+                  order.order_id
+                }</h3>
+                <p class="text-gray-600">${new Date(
+                  order.created_at
+                ).toLocaleString()}</p>
+              </div>
+              <span class="px-3 py-1 rounded-full text-sm font-medium ${
+                statusColors[order.status]
+              }">
+                ${statusTexts[order.status]}
+              </span>
+            </div>
+            
+            <div class="mb-4">
+              <h4 class="font-medium mb-2">Sipariş Detayları:</h4>
+              <ul class="space-y-2">
+                ${order.items
+                  .map(
+                    (item) => `
+                  <li class="flex justify-between">
+                    <span>${item.product_name} x ${item.quantity}</span>
+                    <span>${item.price} TL</span>
+                  </li>
+                `
+                  )
+                  .join("")}
+              </ul>
+            </div>
+
+            <div class="flex justify-between items-center">
+              <div class="text-lg font-semibold">
+                Toplam: ${order.total_price} TL
+              </div>
+              <div class="space-x-2">
+                ${
+                  order.status === "pending"
+                    ? `
+                  <button onclick="updateOrderStatus(${order.order_id}, 'completed')" 
+                          class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                    Tamamla
+                  </button>
+                  <button onclick="updateOrderStatus(${order.order_id}, 'cancelled')" 
+                          class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+                    İptal Et
+                  </button>
+                `
+                    : ""
+                }
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      // Sipariş durumunu güncelle
+      async function updateOrderStatus(orderId, newStatus) {
+        try {
+          const response = await fetch(`/api/orders/${orderId}/status`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("baristaToken")}`,
+            },
+            body: JSON.stringify({ status: newStatus }),
+          });
+
+          if (response.ok) {
+            loadOrders();
+          } else {
+            const data = await response.json();
+            alert(data.message || "Durum güncellenirken bir hata oluştu");
+          }
+        } catch (error) {
+          console.error("Status update error:", error);
+          alert("Durum güncellenirken bir hata oluştu");
+        }
+      }
+      // Çıkış yap
+      function logout() {
+        localStorage.removeItem("baristaToken");
+        localStorage.removeItem("baristaName");
+        localStorage.removeItem("baristaSpecialty");
+        localStorage.removeItem("baristaImage");
+        document.getElementById("loginSection").style.display = "block";
+        document.getElementById("dashboardSection").style.display = "none";
+      }
+
+      // Sayfa yüklendiğinde token kontrolü
+      document.addEventListener("DOMContentLoaded", () => {
+        const token = localStorage.getItem("baristaToken");
+        if (token) {
+          showDashboard();
+          loadOrders();
+        }
+      });
+
+      // Durum filtreleme
+      document.querySelectorAll(".btn-group .btn").forEach((button) => {
+        button.addEventListener("click", (e) => {
+          document
+            .querySelectorAll(".btn-group .btn")
+            .forEach((btn) => btn.classList.remove("active"));
+          e.target.classList.add("active");
+          const status = e.target.dataset.status;
+          loadOrders(status);
+        });
+      });
+    </script>
+  </body>
+</html>

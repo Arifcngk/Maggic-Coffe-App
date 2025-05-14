@@ -134,3 +134,111 @@ exports.getBranchOrders = async (req, res) => {
     res.status(500).json({ message: "Sorgu başarısız", error: error.message });
   }
 };
+
+exports.getBaristaOrders = async (req, res) => {
+  try {
+    const { barista_id, branch_id } = req.user;
+
+    if (!barista_id || !branch_id) {
+      return res.status(400).json({ message: "Barista bilgileri eksik" });
+    }
+
+    // Önce siparişleri getir
+    const [orders] = await pool.query(
+      `
+      SELECT 
+        o.order_id,
+        o.user_id,
+        o.branch_id,
+        o.status,
+        o.order_date as created_at,
+        o.total_price,
+        u.username,
+        u.phone,
+        u.address
+      FROM orders o
+      LEFT JOIN users u ON o.user_id = u.user_id
+      WHERE o.branch_id = ? AND o.barista_id = ?
+      ORDER BY o.order_date DESC
+    `,
+      [branch_id, barista_id]
+    );
+
+    // Her sipariş için sipariş detaylarını getir
+    for (let order of orders) {
+      const [items] = await pool.query(
+        `
+        SELECT 
+          bo.branch_order_id,
+          bo.coffee_id,
+          bo.quantity,
+          bo.price,
+          bo.selected_volume_ml,
+          bo.delivery_type,
+          bo.intensity,
+          bo.status,
+          c.coffee_name,
+          c.image_url
+        FROM branch_orders bo
+        LEFT JOIN coffees c ON bo.coffee_id = c.coffee_id
+        WHERE bo.order_id = ?
+      `,
+        [order.order_id]
+      );
+
+      order.items = items;
+    }
+
+    res.json(orders);
+  } catch (error) {
+    console.error("Barista siparişleri getirme hatası:", error);
+    res
+      .status(500)
+      .json({ message: "Siparişler getirilirken bir hata oluştu" });
+  }
+};
+
+exports.updateOrderStatus = async (req, res) => {
+  const { orderId } = req.params;
+  const { status } = req.body;
+  const baristaId = req.user.barista_id;
+
+  // Geçerli durumları kontrol et
+  const validStatuses = ["pending", "completed", "cancelled"];
+  if (!validStatuses.includes(status)) {
+    return res.status(400).json({ message: "Geçersiz sipariş durumu" });
+  }
+
+  try {
+    // Önce siparişin bu baristaya ait olup olmadığını kontrol et
+    const [order] = await pool.query(
+      `SELECT o.order_id, o.branch_id 
+       FROM orders o
+       JOIN branch_orders bo ON o.order_id = bo.order_id
+       WHERE o.order_id = ? AND bo.barista_id = ?`,
+      [orderId, baristaId]
+    );
+
+    if (order.length === 0) {
+      return res.status(404).json({
+        message: "Sipariş bulunamadı veya bu siparişi güncelleme yetkiniz yok",
+      });
+    }
+
+    // Sipariş durumunu güncelle
+    await pool.query(
+      `UPDATE orders o
+       JOIN branch_orders bo ON o.order_id = bo.order_id
+       SET o.status = ?, bo.status = ?
+       WHERE o.order_id = ? AND bo.barista_id = ?`,
+      [status, status, orderId, baristaId]
+    );
+
+    res.status(200).json({ message: "Sipariş durumu güncellendi" });
+  } catch (error) {
+    console.error("Sipariş durumu güncelleme hatası:", error);
+    res
+      .status(500)
+      .json({ message: "Sipariş durumu güncellenemedi", error: error.message });
+  }
+};

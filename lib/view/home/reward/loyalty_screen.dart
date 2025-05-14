@@ -52,7 +52,7 @@ class _LoyaltyScreenState extends State<LoyaltyScreen> {
           'Point value of first item: ${historyData.isNotEmpty ? historyData[0]['point_value'] : 'No data'}');
 
       setState(() {
-        _totalPoints = pointsData['total_points'] ?? 0;
+        _totalPoints = (pointsData['total_points'] ?? 0) ~/ 2;
         _weeklyOrderCount = weeklyData['weeklyOrderCount'] ?? 0;
         _coffeeHistory = historyData;
         _isLoading = false;

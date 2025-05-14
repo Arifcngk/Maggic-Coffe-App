@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:maggic_coffe/view/home/menu/menu_view_screen.dart';
-import 'package:maggic_coffe/view/home/order/my_order_view.dart';
 import 'package:maggic_coffe/view/home/reward/loyalty_screen.dart';
 
 class BottomBarWidget extends StatefulWidget {
@@ -15,7 +14,6 @@ class _BottomBarWidgetState extends State<BottomBarWidget> {
   final List<Widget> _pages = const [
     MenuViewScreen(),
     LoyaltyScreen(),
-    MyOrderView(),
   ];
 
   void _onItemTapped(int index) {
